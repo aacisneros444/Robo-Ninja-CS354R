@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using Priority_Queue;
 
+/// <summary>
+/// A class to conduct pathfinding on the sparse voxel octree.
+/// </summary>
 public class OctreePathfinder : MonoBehaviour {
 
     public Transform startT;

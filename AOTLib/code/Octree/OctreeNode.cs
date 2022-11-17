@@ -36,6 +36,9 @@ public static class FaceExtensions {
     }
 }
 
+/// <summary>
+/// A class to model a node for a sparse voxel octree.
+/// </summary>
 public class OctreeNode {
     private static readonly Vector3[] s_neighborVectorDirs = {
         Vector3.right,

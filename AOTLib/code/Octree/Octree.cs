@@ -1,5 +1,10 @@
 using UnityEngine;
 
+/// <summary>
+/// Octree monobehavior adapter. Handles creating
+/// root OctreeNode and finding registered colliders
+/// for creating octree.
+/// </summary>
 public class Octree : MonoBehaviour {
     [SerializeField] private int _worldSize = 512;
     [SerializeField] private int _minNodeSize = 8;
