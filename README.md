@@ -1,7 +1,13 @@
 # AOT - CS354R Final Project
+## Overview
+As stated in the design document, my final project is a plugin for UnityEngine. 
+
+-The plugin code is located in AOTLib/code/
+-The Unity project is located in AOTProject
+
 ## Links
 
-- [Design](https://docs.google.com/document/d/1ak7sRlAg89GKwfk467ZYdelZO70lKg4bU35JVlfL7rw/edit)
+- [Design Doc](https://docs.google.com/document/d/1ak7sRlAg89GKwfk467ZYdelZO70lKg4bU35JVlfL7rw/edit)
 
 - [Alpha/Milestone Video](https://youtu.be/-Xd1_spMVP0)
 
