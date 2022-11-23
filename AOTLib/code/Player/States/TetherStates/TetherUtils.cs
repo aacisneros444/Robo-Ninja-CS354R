@@ -9,7 +9,7 @@ public static class TetherUtils {
             tetherPoint = Vector3.zero
         };
         if (Physics.Raycast(ray, out RaycastHit rayHit,
-            controllerData.maxTetherFireDistance)) {
+            controllerData.maxTetherFireDistance, ~LayerMask.GetMask("Player"))) {
             tetherData.tethered = true;
             tetherData.tetherPoint = rayHit.point;
         }
@@ -19,10 +19,10 @@ public static class TetherUtils {
     // Keep the player tethered within tether length with a spring force.
     public static void ApplyTetherSpring(PlayerControllerData controllerData,
         Vector3 tetherPoint, float tetherLength) {
-        float distance = Vector3.Distance(tetherPoint, controllerData.rightTetherOrigin.position);
+        float distance = Vector3.Distance(tetherPoint, controllerData.rootTransform.position);
         const float errorThreshold = 0.5f;
         if (distance > tetherLength + errorThreshold) {
-            Vector3 dir = (tetherPoint - controllerData.rightTetherOrigin.position).normalized;
+            Vector3 dir = (tetherPoint - controllerData.rootTransform.position).normalized;
             float dirVelocity = Vector3.Dot(dir, controllerData.rb.velocity);
             float springForce = ((controllerData.tetherSpringStrength * distance) -
                 (controllerData.tetherSpringDamper * dirVelocity));
@@ -31,14 +31,14 @@ public static class TetherUtils {
     }
 
     // Reel in the tether direction.
-    public static void ApplyTetherReel(PlayerControllerData controllerData,
-        Vector3 tetherPoint, ref float tetherLength) {
+    public static void ApplyTetherReel(PlayerControllerData controllerData, Vector3 tetherPoint) {
         Vector3 dir = (tetherPoint - controllerData.rootTransform.position).normalized;
+
         // Swing a bit to the left or right if A or D is pressed.
         float adInput = Input.GetAxisRaw("Horizontal");
+        float distanceToTether = Vector3.Distance(tetherPoint,
+            controllerData.rootTransform.position);
         if (adInput != 0) {
-            float distanceToTether = Vector3.Distance(tetherPoint,
-                controllerData.rootTransform.position);
             float rightLeftStrength = Mathf.Clamp01(1f / distanceToTether);
             Vector3 swing = Vector3.Cross(Vector3.up, dir) *
                 rightLeftStrength * controllerData.horitontalSwingStrength;
@@ -49,14 +49,17 @@ public static class TetherUtils {
             dir.Normalize();
         }
 
-        Vector3 goalVelocity = (dir * controllerData.maxReelSpeed);
-        Vector3 oldRbVelocity = controllerData.rb.velocity;
-        Vector3 goalAccel = (goalVelocity - oldRbVelocity) / Time.fixedDeltaTime;
-        goalAccel = Vector3.ClampMagnitude(goalAccel, controllerData.maxReelAcceleration);
-        // F=ma
-        controllerData.rb.AddForce(controllerData.rb.mass * goalAccel);
+        PhysicsUtils.ChangeVelocityWithMaxAcceleration(controllerData.rb, dir,
+            controllerData.maxReelSpeed, controllerData.maxReelAcceleration);
+    }
 
-        tetherLength = Vector3.Distance(controllerData.rightTetherOrigin.position, tetherPoint);
+    // Update the tether length for the current state.
+    public static void UpdateTetherLength(PlayerControllerData controllerData, Vector3 tetherPoint,
+        ref float tetherLength) {
+        float distanceToTether = Vector3.Distance(controllerData.rootTransform.position, tetherPoint);
+        if (distanceToTether < tetherLength) {
+            tetherLength = distanceToTether;
+        }
     }
 }
 

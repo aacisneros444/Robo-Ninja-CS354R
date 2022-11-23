@@ -41,7 +41,7 @@ GameObject:
   - component: {fileID: 5663880388928404011}
   - component: {fileID: 5663880388928404020}
   m_Layer: 0
-  m_Name: Boosters
+  m_Name: Thrusters
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -452,6 +452,15 @@ TrailRenderer:
         weightedMode: 0
         inWeight: 0.33333334
         outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.9968355
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
@@ -647,12 +656,12 @@ MonoBehaviour:
   _maxBurstAcceleration: 75
   _rightTetherOrigin: {fileID: 5663880390723005078}
   _leftTetherOrigin: {fileID: 5663880388888706465}
-  _maxTetherFireDistance: 100
+  _maxTetherFireDistance: 150
   _tetherSpringStrength: 250
   _tetherSpringDamper: 200
   _maxReelSpeed: 22
   _maxReelAcceleration: 50
-  _horizontalSwingStrength: 20
+  _horizontalSwingStrength: 22
 --- !u!114 &5663880390838501057
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -754,6 +763,15 @@ TrailRenderer:
         weightedMode: 0
         inWeight: 0.33333334
         outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 1
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4

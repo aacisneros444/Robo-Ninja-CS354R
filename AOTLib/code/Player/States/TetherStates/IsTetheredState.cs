@@ -17,7 +17,7 @@ public class IsTetheredState : IState {
     }
 
     public void Enter() {
-        _tetherLength = Vector3.Distance(_controllerData.rightTetherOrigin.position, _tetherPoint);
+        _tetherLength = Vector3.Distance(_controllerData.rootTransform.position, _tetherPoint);
         EnteredTetherState?.Invoke(_controllerData, _tetherPoint);
     }
 
@@ -31,8 +31,11 @@ public class IsTetheredState : IState {
             _parentFsm.PushState(new IsReelingState(_parentFsm,
                 _controllerData, _tetherPoint, _tetherLength));
         }
+
         _controllerData.playerModel.transform.forward =
             (_tetherPoint - _controllerData.rootTransform.position).normalized;
+
+        TetherUtils.UpdateTetherLength(_controllerData, _tetherPoint, ref _tetherLength);
     }
 
     public void FixedUpdate() {

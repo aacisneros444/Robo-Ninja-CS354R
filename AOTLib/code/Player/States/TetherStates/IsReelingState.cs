@@ -32,13 +32,16 @@ public class IsReelingState : IState {
             _parentFsm.PopState();
             _parentFsm.PushState(new IsTetheredState(_parentFsm, _controllerData, _tetherPoint));
         }
+
         _controllerData.playerModel.transform.forward =
             (_tetherPoint - _controllerData.rootTransform.position).normalized;
+
+        TetherUtils.UpdateTetherLength(_controllerData, _tetherPoint, ref _tetherLength);
     }
 
     public void FixedUpdate() {
         TetherUtils.ApplyTetherSpring(_controllerData, _tetherPoint, _tetherLength);
-        TetherUtils.ApplyTetherReel(_controllerData, _tetherPoint, ref _tetherLength);
+        TetherUtils.ApplyTetherReel(_controllerData, _tetherPoint);
     }
 
     public void Exit() {
