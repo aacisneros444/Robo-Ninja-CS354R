@@ -9,6 +9,7 @@ public class Octree : MonoBehaviour {
     [SerializeField] private int _worldSize = 512;
     [SerializeField] private int _minNodeSize = 8;
     [SerializeField] private int _maxNodeSize = 32;
+    [SerializeField] private bool _drawEntireTree = false;
 
     private OctreeNode _root;
     public OctreeNode Root { get { return _root; } }
@@ -35,7 +36,9 @@ public class Octree : MonoBehaviour {
 
     private void OnDrawGizmos() {
         if (Application.isPlaying) {
-            //_root.Draw();
+            if (_drawEntireTree) {
+                _root.Draw();
+            }
             if (_posDrawTarget != null) {
                 _posDrawTarget.DrawOnlySelf();
                 _posDrawTarget.DrawEmptyNeighbors();

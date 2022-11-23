@@ -13,7 +13,7 @@ public class NotBurstingState : IState {
     }
 
     public void Enter() {
-
+        _controllerData.animator.Play("Falling");
     }
 
     public void Update() {

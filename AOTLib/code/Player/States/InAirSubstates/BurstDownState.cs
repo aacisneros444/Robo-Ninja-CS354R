@@ -1,9 +1,12 @@
 using UnityEngine;
+using System;
 
 public class BurstDownState : IState {
 
     private StateMachine _parentFsm;
     private PlayerControllerData _controllerData;
+    public static event Action OnBurst;
+    public static event Action OnExitBurst;
 
     public BurstDownState(StateMachine parentFsm, PlayerControllerData playerControllerData) {
         _parentFsm = parentFsm;
@@ -11,7 +14,9 @@ public class BurstDownState : IState {
     }
 
     public void Enter() {
-        _controllerData.rb.velocity = Vector3.zero;
+        OnBurst?.Invoke();
+        _controllerData.animator.Play("BurstDown");
+        BurstUtils.DampVelocityForBurst(_controllerData, Vector3.down);
     }
 
     public void Update() {
@@ -26,6 +31,6 @@ public class BurstDownState : IState {
     }
 
     public void Exit() {
-
+        OnExitBurst?.Invoke();
     }
 }

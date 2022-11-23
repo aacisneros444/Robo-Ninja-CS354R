@@ -13,7 +13,7 @@ public class PlayerMovingState : IState {
     }
 
     public void Enter() {
-
+        _controllerData.animator.Play("Run");
     }
 
     public void Update() {

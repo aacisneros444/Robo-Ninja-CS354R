@@ -13,7 +13,7 @@ public class PlayerIdleState : IState {
     }
 
     public void Enter() {
-
+        _controllerData.animator.Play("Idle");
     }
 
     public void Update() {

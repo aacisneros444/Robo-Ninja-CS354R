@@ -16,9 +16,13 @@ public class OctreePathfinder : MonoBehaviour {
     private OctreeNode _currentToNode;
     public GameObject pathMarkerPrefab;
     private List<Vector3> pathToDraw;
+    [SerializeField] private bool _visualizePathfinding = false;
 
-    private void Start() {
-        StartCoroutine(GetPath(startT.position, endT.position));
+    private void Update() {
+        if (_visualizePathfinding) {
+            StartCoroutine(GetPath(startT.position, endT.position));
+            _visualizePathfinding = false;
+        }
     }
 
     private void OnDrawGizmos() {

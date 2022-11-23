@@ -1,9 +1,12 @@
 using UnityEngine;
+using System;
 
 public class BurstForwardState : IState {
 
     private StateMachine _parentFsm;
     private PlayerControllerData _controllerData;
+    public static event Action OnBurst;
+    public static event Action OnExitBurst;
 
     public BurstForwardState(StateMachine parentFsm, PlayerControllerData playerControllerData) {
         _parentFsm = parentFsm;
@@ -11,7 +14,9 @@ public class BurstForwardState : IState {
     }
 
     public void Enter() {
-        _controllerData.rb.velocity = Vector3.zero;
+        OnBurst?.Invoke();
+        _controllerData.animator.Play("BurstForward");
+        BurstUtils.DampVelocityForBurst(_controllerData, _controllerData.cam.transform.forward);
     }
 
     public void Update() {
@@ -31,5 +36,6 @@ public class BurstForwardState : IState {
     public void Exit() {
         Vector3 originalEuler = _controllerData.playerModel.eulerAngles;
         _controllerData.playerModel.rotation = Quaternion.Euler(0f, originalEuler.y, originalEuler.z);
+        OnExitBurst?.Invoke();
     }
 }

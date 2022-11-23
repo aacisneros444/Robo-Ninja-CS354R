@@ -1,9 +1,12 @@
 using UnityEngine;
+using System;
 
 public class BurstRightState : IState {
 
     private StateMachine _parentFsm;
     private PlayerControllerData _controllerData;
+    public static event Action OnBurst;
+    public static event Action OnExitBurst;
 
     public BurstRightState(StateMachine parentFsm, PlayerControllerData playerControllerData) {
         _parentFsm = parentFsm;
@@ -11,7 +14,9 @@ public class BurstRightState : IState {
     }
 
     public void Enter() {
-        _controllerData.rb.velocity = Vector3.zero;
+        OnBurst?.Invoke();
+        _controllerData.animator.Play("BurstSideRight");
+        BurstUtils.DampVelocityForBurst(_controllerData, _controllerData.cam.transform.right);
     }
 
     public void Update() {
@@ -28,6 +33,6 @@ public class BurstRightState : IState {
     }
 
     public void Exit() {
-
+        OnExitBurst?.Invoke();
     }
 }

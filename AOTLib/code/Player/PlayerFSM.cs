@@ -3,57 +3,69 @@ using UnityEngine;
 public class PlayerFSM : MonoBehaviour {
     [SerializeField] private Camera _cam;
     [SerializeField] private Transform _playerModel;
+    [SerializeField] private Animator _playerAnimator;
 
     [Header("Float/Hover")]
-    [SerializeField]
-    private float _groundCheckRayLength = 1f;
-    [SerializeField]
-    private float _floatHeight = 0.5f;
-    [SerializeField]
-    private float _floatSpringStrength = 4000f;
-    [SerializeField]
-    private float _floatSpringDamper = 250f;
+    [SerializeField] private float _groundCheckRayLength = 1f;
+    [SerializeField] private float _floatHeight = 0.5f;
+    [SerializeField] private float _floatSpringStrength = 4000f;
+    [SerializeField] private float _floatSpringDamper = 250f;
 
     [Header("Grounded Locomotion")]
-    [SerializeField]
-    private float _maxSpeed = 8f;
-    [SerializeField]
-    private float _acceleration = 200f;
-    [SerializeField]
-    private float _maxAcceleration = 150f;
-    [SerializeField]
-    private float _jumpStrength = 5000f;
+    [SerializeField] private float _maxSpeed = 7f;
+    [SerializeField] private float _maxAcceleration = 150f;
+    [SerializeField] private float _jumpStrength = 2700f;
 
     [Header("Aerial Locomotion")]
-    [SerializeField]
-    private float _maxBurstSpeed = 16f;
-    [SerializeField]
-    private float _maxBurstAcceleration = 50f;
+    [SerializeField] private float _burstStartDampFactor = 0.5f;
+    [SerializeField] private float _maxBurstSpeed = 22f;
+    [SerializeField] private float _maxBurstAcceleration = 75f;
 
-    private PlayerControllerData _playerControllerData;
+    [Header("Tether")]
+    [SerializeField] private Transform _rightTetherOrigin;
+    [SerializeField] private Transform _leftTetherOrigin;
+    [SerializeField] private float _maxTetherFireDistance = 200f;
+    [SerializeField] private float _tetherSpringStrength = 250f;
+    [SerializeField] private float _tetherSpringDamper = 200f;
+    [SerializeField] private float _maxReelSpeed = 22f;
+    [SerializeField] private float _maxReelAcceleration = 50f;
+    [SerializeField] private float _horizontalSwingStrength = 20f;
+
     private Rigidbody _rb;
     private StateMachine _fsm;
 
     private void Awake() {
         _rb = GetComponent<Rigidbody>();
-        _playerControllerData = new PlayerControllerData {
+        PlayerControllerData controllerData = new PlayerControllerData {
             cam = _cam,
             rootTransform = transform,
             playerModel = _playerModel,
             rb = _rb,
+            animator = _playerAnimator,
             groundCheckRayLength = _groundCheckRayLength,
             floatHeight = _floatHeight,
             floatSpringStrength = _floatSpringStrength,
             floatSpringDamper = _floatSpringDamper,
             maxSpeed = _maxSpeed,
-            acceleration = _acceleration,
             maxAcceleration = _maxAcceleration,
             jumpStrength = _jumpStrength,
+            burstStartDampFactor = _burstStartDampFactor,
             maxBurstSpeed = _maxBurstSpeed,
-            maxBurstAcceleration = _maxBurstAcceleration
+            maxBurstAcceleration = _maxBurstAcceleration,
+            maxTetherFireDistance = _maxTetherFireDistance,
+            rightTetherOrigin = _rightTetherOrigin,
+            leftTetherOrigin = _leftTetherOrigin,
+            tetherSpringStrength = _tetherSpringStrength,
+            tetherSpringDamper = _tetherSpringDamper,
+            maxReelSpeed = _maxReelSpeed,
+            maxReelAcceleration = _maxReelAcceleration,
+            horitontalSwingStrength = _horizontalSwingStrength
         };
+        StateMachine tetherFsm = new StateMachine();
+        tetherFsm.PushState(new NotTetheredState(tetherFsm, controllerData));
+
         _fsm = new StateMachine();
-        _fsm.PushState(new PlayerGroundedState(_fsm, _playerControllerData));
+        _fsm.PushState(new PlayerGroundedState(_fsm, tetherFsm, controllerData));
     }
 
     private void Update() {
@@ -70,6 +82,7 @@ public class PlayerControllerData {
     public Transform rootTransform;
     public Transform playerModel;
     public Rigidbody rb;
+    public Animator animator;
     public float groundCheckRayLength;
     public float floatHeight;
     public float floatSpringStrength;
@@ -78,6 +91,15 @@ public class PlayerControllerData {
     public float acceleration;
     public float maxAcceleration;
     public float jumpStrength;
+    public float burstStartDampFactor;
     public float maxBurstSpeed;
     public float maxBurstAcceleration;
+    public float maxTetherFireDistance;
+    public Transform rightTetherOrigin;
+    public Transform leftTetherOrigin;
+    public float tetherSpringStrength;
+    public float tetherSpringDamper;
+    public float maxReelSpeed;
+    public float maxReelAcceleration;
+    public float horitontalSwingStrength;
 }
