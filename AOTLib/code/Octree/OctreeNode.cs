@@ -362,7 +362,7 @@ public class OctreeNode {
     /// Determine if this node is empty.
     /// </summary>
     /// <returns>True if empty, false otherwise.</returns>
-    private bool IsEmpty() {
+    public bool IsEmpty() {
         return _numContainedObjects == 0;
     }
 

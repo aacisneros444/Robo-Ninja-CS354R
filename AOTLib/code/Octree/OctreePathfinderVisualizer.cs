@@ -23,6 +23,7 @@ public class OctreePathfinderVisualizer : MonoBehaviour {
 
     private void Update() {
         if (_visualizePathfinding) {
+            Debug.Log("visaulizing");
             StartCoroutine(GetPath(startT.position, endT.position));
             _visualizePathfinding = false;
         }
@@ -43,30 +44,36 @@ public class OctreePathfinderVisualizer : MonoBehaviour {
         }
     }
 
-    IEnumerator GetPath(Vector3 start, Vector3 end) {
+    public IEnumerator GetPath(Vector3 start, Vector3 end) {
         pathToDraw = null;
+        if (!_octree.Root.NodeBounds.Contains(start)) {
+            start = _octree.Root.NodeBounds.ClosestPoint(start);
+        }
+        if (!_octree.Root.NodeBounds.Contains(end)) {
+            end = _octree.Root.NodeBounds.ClosestPoint(end);
+        }
         SimplePriorityQueue<OctreeNode> frontier = new SimplePriorityQueue<OctreeNode>();
         Dictionary<OctreeNode, OctreeNode> cameFrom = new Dictionary<OctreeNode, OctreeNode>();
         Dictionary<OctreeNode, int> costSoFar = new Dictionary<OctreeNode, int>();
 
-        OctreeNode startNode = _octree.Root.GetLeafNodeAtPosition(start);
-        OctreeNode goal = _octree.Root.GetLeafNodeAtPosition(end);
+        OctreeNode startNode = _octree.Root.GetClosestEmptyLeafNode(start);
+        OctreeNode goal = _octree.Root.GetClosestEmptyLeafNode(end);
+        if (!goal.NodeBounds.Contains(end)) {
+            end = goal.NodeBounds.ClosestPoint(end);
+        }
 
         int numSearched = 0;
         frontier.Enqueue(startNode, 0);
         while (frontier.Count != 0) {
             OctreeNode current = frontier.Dequeue();
             _currentFromNode = current;
-
             if (current == goal) {
                 break;
             }
 
             foreach (OctreeNode next in current.EmptyNeighbors) {
-                numSearched++;
                 _currentToNode = next;
-                yield return new WaitForSeconds(_yieldTime);
-
+                numSearched++;
                 int newCost = 0;
                 costSoFar.TryGetValue(next, out newCost);
                 newCost += 1;
@@ -76,6 +83,7 @@ public class OctreePathfinderVisualizer : MonoBehaviour {
                     frontier.Enqueue(next, priority);
                     cameFrom[next] = current;
                 }
+                yield return new WaitForSeconds(_yieldTime);
             }
         }
 
@@ -89,14 +97,10 @@ public class OctreePathfinderVisualizer : MonoBehaviour {
         }
         path.Add(start);
         path.Reverse();
-        foreach (Vector3 waypoint in path) {
-            Instantiate(pathMarkerPrefab, waypoint, Quaternion.identity);
-        }
-        Debug.Log("Num nodes searched " + numSearched);
-
-        _currentToNode = null;
-        _currentFromNode = null;
         pathToDraw = path;
+        _currentFromNode = null;
+        _currentToNode = null;
+        Debug.Log("Num nodes searched " + numSearched);
     }
 
     private float Heuristic(OctreeNode node1, OctreeNode node2) {

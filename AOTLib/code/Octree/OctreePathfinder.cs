@@ -22,6 +22,9 @@ public class OctreePathfinder : MonoBehaviour {
 
         OctreeNode startNode = _octree.Root.GetClosestEmptyLeafNode(start);
         OctreeNode goal = _octree.Root.GetClosestEmptyLeafNode(end);
+        if (!goal.NodeBounds.Contains(end)) {
+            end = goal.NodeBounds.ClosestPoint(end);
+        }
 
         int numSearched = 0;
         frontier.Enqueue(startNode, 0);

@@ -20,8 +20,6 @@ public class FollowingPathState : IState {
 
     public void Enter() {
         _playerPositionOnStateEnter = _controllerData.playerTransform.position;
-        //TryTakeStraightPathToDestination();
-        // Debug.Log(_pathIndex + "/" + _path.Count);
     }
 
     public void Update() {
@@ -33,6 +31,10 @@ public class FollowingPathState : IState {
             _parentFsm.PushState(new NoDestinationState(_parentFsm, _controllerData, _timeSinceLastRepath));
             return;
         }
+
+        // if (_pathIndex < _path.Count - 1) {
+        //     Debug.Log("Current wp: " + _path[_pathIndex - 1] + "tryin wp: " + _path[_pathIndex] + " last: " + _path[_pathIndex + 1]);
+        // }
 
         // Check to repath if too long since last repath.
         if (_timeSinceLastRepath > _controllerData.repathRate) {
@@ -56,10 +58,8 @@ public class FollowingPathState : IState {
         _controllerData.rootTransform.rotation =
             Quaternion.LookRotation(dirToWaypoint, Vector3.up);
 
-        if (toWaypoint.magnitude < 0.5f) {
+        if (toWaypoint.magnitude < 1f) {
             _pathIndex++;
-            // Debug.Log(_pathIndex + "/" + _path.Count);
-            // If there is a clear straight path to the destination at the next waypoint, take it.
             TryTakeStraightPathToDestination();
         }
     }
@@ -86,7 +86,6 @@ public class FollowingPathState : IState {
             newPath.Add(_path[_path.Count - 1]);
             _parentFsm.PopState();
             _parentFsm.PushState(new FollowingPathState(_parentFsm, _controllerData, newPath, _timeSinceLastRepath));
-            //Debug.Log("Making a beeline");
         }
     }
 }
