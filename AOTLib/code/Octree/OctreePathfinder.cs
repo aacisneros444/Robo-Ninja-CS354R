@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Priority_Queue;
@@ -8,52 +7,26 @@ using Priority_Queue;
 /// </summary>
 public class OctreePathfinder : MonoBehaviour {
 
-    public Transform startT;
-    public Transform endT;
-
     [SerializeField] private Octree _octree;
-    private OctreeNode _currentFromNode;
-    private OctreeNode _currentToNode;
-    public GameObject pathMarkerPrefab;
-    private List<Vector3> pathToDraw;
-    [SerializeField] private bool _visualizePathfinding = false;
 
-    private void Update() {
-        if (_visualizePathfinding) {
-            StartCoroutine(GetPath(startT.position, endT.position));
-            _visualizePathfinding = false;
+    public List<Vector3> GetPath(Vector3 start, Vector3 end) {
+        if (!_octree.Root.NodeBounds.Contains(start)) {
+            start = _octree.Root.NodeBounds.ClosestPoint(start);
         }
-    }
-
-    private void OnDrawGizmos() {
-        if (_currentFromNode != null) {
-            _octree.DrawSingleNode(_currentFromNode);
+        if (!_octree.Root.NodeBounds.Contains(end)) {
+            end = _octree.Root.NodeBounds.ClosestPoint(end);
         }
-        if (_currentToNode != null) {
-            _octree.DrawSingleNode(_currentToNode);
-        }
-        if (pathToDraw != null) {
-            Gizmos.color = Color.red;
-            for (int i = 0; i < pathToDraw.Count - 1; i++) {
-                Debug.DrawLine(pathToDraw[i], pathToDraw[i + 1]);
-            }
-        }
-    }
-
-    IEnumerator GetPath(Vector3 start, Vector3 end) {
-        pathToDraw = null;
         SimplePriorityQueue<OctreeNode> frontier = new SimplePriorityQueue<OctreeNode>();
         Dictionary<OctreeNode, OctreeNode> cameFrom = new Dictionary<OctreeNode, OctreeNode>();
         Dictionary<OctreeNode, int> costSoFar = new Dictionary<OctreeNode, int>();
 
-        OctreeNode startNode = _octree.Root.GetLeafNodeAtPosition(start);
-        OctreeNode goal = _octree.Root.GetLeafNodeAtPosition(end);
+        OctreeNode startNode = _octree.Root.GetClosestEmptyLeafNode(start);
+        OctreeNode goal = _octree.Root.GetClosestEmptyLeafNode(end);
 
         int numSearched = 0;
         frontier.Enqueue(startNode, 0);
         while (frontier.Count != 0) {
             OctreeNode current = frontier.Dequeue();
-            _currentFromNode = current;
 
             if (current == goal) {
                 break;
@@ -61,9 +34,6 @@ public class OctreePathfinder : MonoBehaviour {
 
             foreach (OctreeNode next in current.EmptyNeighbors) {
                 numSearched++;
-                _currentToNode = next;
-                yield return new WaitForSeconds(0.05f);
-
                 int newCost = 0;
                 costSoFar.TryGetValue(next, out newCost);
                 newCost += 1;
@@ -86,14 +56,8 @@ public class OctreePathfinder : MonoBehaviour {
         }
         path.Add(start);
         path.Reverse();
-        foreach (Vector3 waypoint in path) {
-            Instantiate(pathMarkerPrefab, waypoint, Quaternion.identity);
-        }
-        Debug.Log("Num nodes searched " + numSearched);
-
-        _currentToNode = null;
-        _currentFromNode = null;
-        pathToDraw = path;
+        // Debug.Log("Num nodes searched " + numSearched);
+        return path;
     }
 
     private float Heuristic(OctreeNode node1, OctreeNode node2) {

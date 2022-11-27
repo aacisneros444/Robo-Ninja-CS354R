@@ -5,41 +5,45 @@ public class IsTetheredState : IState {
 
     private StateMachine _parentFsm;
     private PlayerControllerData _controllerData;
-    private Vector3 _tetherPoint;
+    private Transform _tetherEnd;
     private float _tetherLength;
-    public static event Action<PlayerControllerData, Vector3> EnteredTetherState;
+    public static event Action<PlayerControllerData, Transform> EnteredTetherState;
 
     public IsTetheredState(StateMachine parentFsm, PlayerControllerData playerControllerData,
-        Vector3 tetherPoint) {
+        Transform tetherEnd) {
         _parentFsm = parentFsm;
         _controllerData = playerControllerData;
-        _tetherPoint = tetherPoint;
+        _tetherEnd = tetherEnd;
     }
 
     public void Enter() {
-        _tetherLength = Vector3.Distance(_controllerData.rootTransform.position, _tetherPoint);
-        EnteredTetherState?.Invoke(_controllerData, _tetherPoint);
+        _tetherLength = Vector3.Distance(_controllerData.rootTransform.position, _tetherEnd.position);
+        EnteredTetherState?.Invoke(_controllerData, _tetherEnd);
     }
 
     public void Update() {
-        if (!Input.GetMouseButton(1)) {
+        if (!Input.GetMouseButton(1) || _tetherEnd == null) {
             _parentFsm.PopState();
-            _parentFsm.PushState(new NotTetheredState(_parentFsm, _controllerData));
+            _parentFsm.PushState(new NotTetheredState(_parentFsm, _controllerData, _tetherEnd));
+            return;
         }
         if (Input.GetKey(KeyCode.Space)) {
             _parentFsm.PopState();
             _parentFsm.PushState(new IsReelingState(_parentFsm,
-                _controllerData, _tetherPoint, _tetherLength));
+                _controllerData, _tetherEnd, _tetherLength));
         }
 
         _controllerData.playerModel.transform.forward =
-            (_tetherPoint - _controllerData.rootTransform.position).normalized;
+            (_tetherEnd.position - _controllerData.rootTransform.position).normalized;
 
-        TetherUtils.UpdateTetherLength(_controllerData, _tetherPoint, ref _tetherLength);
+        TetherUtils.UpdateTetherLength(_controllerData, _tetherEnd.position, ref _tetherLength);
     }
 
     public void FixedUpdate() {
-        TetherUtils.ApplyTetherSpring(_controllerData, _tetherPoint, _tetherLength);
+        if (_tetherEnd == null) {
+            return;
+        }
+        TetherUtils.ApplyTetherSpring(_controllerData, _tetherEnd.position, _tetherLength);
     }
 
     public void Exit() {

@@ -382,7 +382,7 @@ public class OctreeNode {
         Stack<OctreeNode> stack = new Stack<OctreeNode>();
         stack.Push(this);
         int it = 0;
-        while (stack.Count > 0 && it < 8) {
+        while (stack.Count > 0 && it < s_layerSizes.Length) {
             OctreeNode node = stack.Pop();
             if (!node.IsLeafNode()) {
                 for (int i = 0; i < 8; i++) {
@@ -392,6 +392,49 @@ public class OctreeNode {
                 }
             } else {
                 return node;
+            }
+            it++;
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// Get the closest empty leaf node for a given position/
+    /// </summary>
+    /// <param name="position">The given position.</param>
+    /// <returns>The leaf node at the given position if it is empty. Otherwise,
+    /// a nearby node that is empty and leaf node. Null if not found.</returns>
+    public OctreeNode GetClosestEmptyLeafNode(Vector3 position) {
+        OctreeNode leafNodeAtPosition = GetLeafNodeAtPosition(position);
+        if (leafNodeAtPosition.IsEmpty()) {
+            return leafNodeAtPosition;
+        }
+        return GetClosestEmptyLeafNode(leafNodeAtPosition);
+    }
+
+    private OctreeNode GetClosestEmptyLeafNode(OctreeNode node) {
+        Queue<OctreeNode> queue = new Queue<OctreeNode>();
+        HashSet<OctreeNode> discovered = new HashSet<OctreeNode>();
+        for (int i = 0; i < 6; i++) {
+            OctreeNode neighbor = node._faceNeighbors[i];
+            if (neighbor != null) {
+                queue.Enqueue(neighbor);
+                discovered.Add(neighbor);
+            }
+        }
+        int it = 0;
+        const int maxIterations = 100;
+        while (queue.Count > 0 && it < maxIterations) {
+            OctreeNode curr = queue.Dequeue();
+            if (curr.IsLeafNode() && curr.IsEmpty()) {
+                return curr;
+            }
+            for (int i = 0; i < 6; i++) {
+                OctreeNode neighbor = curr._faceNeighbors[i];
+                if (neighbor != null && !discovered.Contains(neighbor)) {
+                    queue.Enqueue(neighbor);
+                    discovered.Add(neighbor);
+                }
             }
             it++;
         }

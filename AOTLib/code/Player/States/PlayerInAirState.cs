@@ -34,10 +34,12 @@ public class PlayerInAirState : IState {
             }
         }
         if (Input.GetMouseButtonDown(0)) {
-            _controllerData.playerModel.rotation = Quaternion.LookRotation(_controllerData.cam.transform.forward);
-            _controllerData.animator.Play("SwordSwingRoll");
-            PhysicsUtils.ChangeVelocityWithMaxAcceleration(_controllerData.rb, _controllerData.cam.transform.forward,
-                _controllerData.maxBurstSpeed, 5000f);
+            // _controllerData.playerModel.rotation = Quaternion.LookRotation(_controllerData.cam.transform.forward);
+            // _controllerData.animator.Play("SwordSwingRoll");
+            // PhysicsUtils.ChangeVelocityWithMaxAcceleration(_controllerData.rb, _controllerData.cam.transform.forward,
+            //     _controllerData.maxBurstSpeed, 5000f);
+            _parentFsm.PopState();
+            _parentFsm.PushState(new PlayerAttackingState(_parentFsm, _tetherFsm, _controllerData));
         }
     }
 

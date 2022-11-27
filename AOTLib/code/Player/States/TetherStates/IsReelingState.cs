@@ -5,16 +5,16 @@ public class IsReelingState : IState {
 
     private StateMachine _parentFsm;
     private PlayerControllerData _controllerData;
-    private Vector3 _tetherPoint;
+    private Transform _tetherEnd;
     private float _tetherLength;
     public static event Action OnReeling;
     public static event Action OnStopReeling;
 
     public IsReelingState(StateMachine parentFsm, PlayerControllerData playerControllerData,
-        Vector3 tetherPoint, float tetherLength) {
+        Transform tetherEnd, float tetherLength) {
         _parentFsm = parentFsm;
         _controllerData = playerControllerData;
-        _tetherPoint = tetherPoint;
+        _tetherEnd = tetherEnd;
         _tetherLength = tetherLength;
     }
 
@@ -24,28 +24,34 @@ public class IsReelingState : IState {
     }
 
     public void Update() {
-        if (!Input.GetMouseButton(1)) {
+        if (!Input.GetMouseButton(1) || _tetherEnd == null) {
             _parentFsm.PopState();
-            _parentFsm.PushState(new NotTetheredState(_parentFsm, _controllerData));
+            _parentFsm.PushState(new NotTetheredState(_parentFsm, _controllerData, _tetherEnd));
+            return;
         }
         if (!Input.GetKey(KeyCode.Space)) {
             _parentFsm.PopState();
-            _parentFsm.PushState(new IsTetheredState(_parentFsm, _controllerData, _tetherPoint));
+            _parentFsm.PushState(new IsTetheredState(_parentFsm, _controllerData, _tetherEnd));
         }
 
         _controllerData.playerModel.transform.forward =
-            (_tetherPoint - _controllerData.rootTransform.position).normalized;
+            (_tetherEnd.position - _controllerData.rootTransform.position).normalized;
 
-        TetherUtils.UpdateTetherLength(_controllerData, _tetherPoint, ref _tetherLength);
+        TetherUtils.UpdateTetherLength(_controllerData, _tetherEnd.position, ref _tetherLength);
     }
 
     public void FixedUpdate() {
-        TetherUtils.ApplyTetherSpring(_controllerData, _tetherPoint, _tetherLength);
-        TetherUtils.ApplyTetherReel(_controllerData, _tetherPoint);
+        if (_tetherEnd == null) {
+            return;
+        }
+        TetherUtils.ApplyTetherSpring(_controllerData, _tetherEnd.position, _tetherLength);
+        TetherUtils.ApplyTetherReel(_controllerData, _tetherEnd.position);
     }
 
     public void Exit() {
         OnStopReeling?.Invoke();
-        _controllerData.animator.Play("Falling");
+        if (!_controllerData.animator.GetCurrentAnimatorStateInfo(0).IsName("SwordSwingRoll")) {
+            _controllerData.animator.Play("Falling");
+        }
     }
 }

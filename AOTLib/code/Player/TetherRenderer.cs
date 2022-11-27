@@ -4,7 +4,7 @@ public class TetherRenderer : MonoBehaviour {
     [SerializeField] private LineRenderer _leftlineRenderer;
     [SerializeField] private LineRenderer _rightlineRenderer;
     private PlayerControllerData _controllerData;
-    private Vector3 _tetherPoint;
+    private Transform _tetherEnd;
     private bool _isTethered = false;
 
     private void Awake() {
@@ -17,11 +17,11 @@ public class TetherRenderer : MonoBehaviour {
     }
 
     private void Update() {
-        if (_isTethered) {
+        if (_isTethered && _tetherEnd != null) {
             UpdateLineRenderer(_leftlineRenderer,
-                _controllerData.rightTetherOrigin.position, _tetherPoint);
+                _controllerData.rightTetherOrigin.position, _tetherEnd.position);
             UpdateLineRenderer(_rightlineRenderer,
-                _controllerData.leftTetherOrigin.position, _tetherPoint);
+                _controllerData.leftTetherOrigin.position, _tetherEnd.position);
         }
     }
 
@@ -32,9 +32,9 @@ public class TetherRenderer : MonoBehaviour {
         lineRenderer.SetPositions(tetherPoints);
     }
 
-    private void OnTether(PlayerControllerData controllerData, Vector3 tetherPoint) {
+    private void OnTether(PlayerControllerData controllerData, Transform tetherEnd) {
         _isTethered = true;
-        _tetherPoint = tetherPoint;
+        _tetherEnd = tetherEnd;
         _controllerData = controllerData;
     }
 

@@ -31,6 +31,11 @@ public class PlayerFSM : MonoBehaviour {
     [SerializeField] private float _maxReelAcceleration = 50f;
     [SerializeField] private float _horizontalSwingStrength = 20f;
 
+    [Header("Attacking")]
+    [SerializeField] private float _enemySphereCastLatchRadius = 1.5f;
+    [SerializeField] private float _attackRayDistance = 2f;
+    [SerializeField] private GameObject _attackTriggerCollider;
+
     private Rigidbody _rb;
     private StateMachine _fsm;
 
@@ -59,10 +64,14 @@ public class PlayerFSM : MonoBehaviour {
             tetherSpringDamper = _tetherSpringDamper,
             maxReelSpeed = _maxReelSpeed,
             maxReelAcceleration = _maxReelAcceleration,
-            horitontalSwingStrength = _horizontalSwingStrength
+            horitontalSwingStrength = _horizontalSwingStrength,
+            enemySphereCastLatchRadius = _enemySphereCastLatchRadius,
+            attackRayDistance = _attackRayDistance,
+            attackTriggerCollider = _attackTriggerCollider
         };
+
         StateMachine tetherFsm = new StateMachine();
-        tetherFsm.PushState(new NotTetheredState(tetherFsm, controllerData));
+        tetherFsm.PushState(new NotTetheredState(tetherFsm, controllerData, null));
 
         _fsm = new StateMachine();
         _fsm.PushState(new PlayerGroundedState(_fsm, tetherFsm, controllerData));
@@ -102,4 +111,7 @@ public class PlayerControllerData {
     public float maxReelSpeed;
     public float maxReelAcceleration;
     public float horitontalSwingStrength;
+    public float enemySphereCastLatchRadius;
+    public float attackRayDistance;
+    public GameObject attackTriggerCollider;
 }

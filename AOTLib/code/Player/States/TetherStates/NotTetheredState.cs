@@ -5,14 +5,20 @@ public class NotTetheredState : IState {
 
     private StateMachine _parentFsm;
     private PlayerControllerData _controllerData;
+    private Transform _tetherEnd;
     public static event Action ExitedTetherState;
 
-    public NotTetheredState(StateMachine parentFsm, PlayerControllerData playerControllerData) {
+    public NotTetheredState(StateMachine parentFsm, PlayerControllerData playerControllerData,
+        Transform tetherEnd) {
         _parentFsm = parentFsm;
         _controllerData = playerControllerData;
+        _tetherEnd = tetherEnd;
     }
 
     public void Enter() {
+        if (_tetherEnd != null) {
+            GameObject.Destroy(_tetherEnd.gameObject);
+        }
         ExitedTetherState?.Invoke();
     }
 
@@ -22,7 +28,7 @@ public class NotTetheredState : IState {
             if (tryTetherResult.tethered) {
                 _parentFsm.PopState();
                 _parentFsm.PushState(new IsTetheredState(_parentFsm,
-                    _controllerData, tryTetherResult.tetherPoint));
+                    _controllerData, tryTetherResult.tetherEnd));
             }
         }
     }

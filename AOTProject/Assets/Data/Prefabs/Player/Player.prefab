@@ -652,16 +652,16 @@ MonoBehaviour:
   _maxAcceleration: 150
   _jumpStrength: 2700
   _burstStartDampFactor: 0.5
-  _maxBurstSpeed: 22
+  _maxBurstSpeed: 20
   _maxBurstAcceleration: 75
   _rightTetherOrigin: {fileID: 5663880390723005078}
   _leftTetherOrigin: {fileID: 5663880388888706465}
   _maxTetherFireDistance: 150
   _tetherSpringStrength: 250
   _tetherSpringDamper: 200
-  _maxReelSpeed: 22
+  _maxReelSpeed: 25
   _maxReelAcceleration: 50
-  _horizontalSwingStrength: 22
+  _horizontalSwingStrength: 15
 --- !u!114 &5663880390838501057
 MonoBehaviour:
   m_ObjectHideFlags: 0
