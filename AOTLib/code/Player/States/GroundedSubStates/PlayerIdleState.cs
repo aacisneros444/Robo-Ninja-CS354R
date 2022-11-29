@@ -2,26 +2,26 @@ using UnityEngine;
 
 public class PlayerIdleState : IState {
     private StateMachine _fsm;
-    private PlayerControllerData _controllerData;
+    private PlayerController _controller;
     private PlayerGroundedState _playerGroundedState;
 
-    public PlayerIdleState(StateMachine parentFsm, PlayerControllerData playerControllerData,
-        PlayerGroundedState playerGroundedState) {
+    public PlayerIdleState(StateMachine parentFsm, PlayerController controller,
+                           PlayerGroundedState playerGroundedState) {
         _fsm = parentFsm;
-        _controllerData = playerControllerData;
+        _controller = controller;
         _playerGroundedState = playerGroundedState;
     }
 
     public void Enter() {
-        _controllerData.animator.Play("Idle");
+        _playerGroundedState.MoveDir = Vector3.zero;
+        _controller.PlayerAnimator.Play("Idle");
     }
 
     public void Update() {
-        Vector3 input = new Vector3(Input.GetAxisRaw("Horizontal"),
-            0f, Input.GetAxisRaw("Vertical"));
+        Vector3 input = PlayerControllerUtils.GetRawWASDInput();
         if (input.magnitude > 0) {
             _fsm.PopState();
-            _fsm.PushState(new PlayerMovingState(_fsm, _controllerData, _playerGroundedState));
+            _fsm.PushState(new PlayerMovingState(_fsm, _controller, _playerGroundedState));
         }
     }
 

@@ -4,30 +4,30 @@ using System;
 public class BurstDownState : IState {
 
     private StateMachine _parentFsm;
-    private PlayerControllerData _controllerData;
+    private PlayerController _controller;
     public static event Action OnBurst;
     public static event Action OnExitBurst;
 
-    public BurstDownState(StateMachine parentFsm, PlayerControllerData playerControllerData) {
+    public BurstDownState(StateMachine parentFsm, PlayerController controller) {
         _parentFsm = parentFsm;
-        _controllerData = playerControllerData;
+        _controller = controller;
     }
 
     public void Enter() {
         OnBurst?.Invoke();
-        _controllerData.animator.Play("BurstDown");
-        BurstUtils.DampVelocityForBurst(_controllerData, Vector3.down);
+        _controller.PlayerAnimator.Play("BurstDown");
+        BurstUtils.DampVelocityForBurst(_controller, Vector3.down);
     }
 
     public void Update() {
         if (!Input.GetKey(KeyCode.Q)) {
             _parentFsm.PopState();
-            _parentFsm.PushState(new NotBurstingState(_parentFsm, _controllerData));
+            _parentFsm.PushState(new NotBurstingState(_parentFsm, _controller));
         }
     }
 
     public void FixedUpdate() {
-        BurstUtils.BurstInDirection(_controllerData, Vector3.down);
+        BurstUtils.BurstInDirection(_controller, Vector3.down);
     }
 
     public void Exit() {

@@ -4,30 +4,30 @@ using System;
 public class BurstUpState : IState {
 
     private StateMachine _parentFsm;
-    private PlayerControllerData _controllerData;
+    private PlayerController _controller;
     public static event Action OnBurst;
     public static event Action OnExitBurst;
 
-    public BurstUpState(StateMachine parentFsm, PlayerControllerData playerControllerData) {
+    public BurstUpState(StateMachine parentFsm, PlayerController controller) {
         _parentFsm = parentFsm;
-        _controllerData = playerControllerData;
+        _controller = controller;
     }
 
     public void Enter() {
         OnBurst?.Invoke();
-        _controllerData.animator.Play("BurstUp");
-        BurstUtils.DampVelocityForBurst(_controllerData, Vector3.up);
+        _controller.PlayerAnimator.Play("BurstUp");
+        BurstUtils.DampVelocityForBurst(_controller, Vector3.up);
     }
 
     public void Update() {
         if (!Input.GetKey(KeyCode.E)) {
             _parentFsm.PopState();
-            _parentFsm.PushState(new NotBurstingState(_parentFsm, _controllerData));
+            _parentFsm.PushState(new NotBurstingState(_parentFsm, _controller));
         }
     }
 
     public void FixedUpdate() {
-        BurstUtils.BurstInDirection(_controllerData, Vector3.up);
+        BurstUtils.BurstInDirection(_controller, Vector3.up);
     }
 
     public void Exit() {

@@ -11,14 +11,14 @@ public class StateMachine {
         _stack = new List<IState>();
     }
 
-    private void Update() {
+    public void Update() {
         IState currState = GetCurrentState();
         if (currState != null) {
             currState.Update();
         }
     }
 
-    private void FixedUpdate() {
+    public void FixedUpdate() {
         IState currState = GetCurrentState();
         if (currState != null) {
             currState.FixedUpdate();

@@ -4,49 +4,66 @@ using System;
 public class IsTetheredState : IState {
 
     private StateMachine _parentFsm;
-    private PlayerControllerData _controllerData;
+    private PlayerController _controller;
     private Transform _tetherEnd;
     private float _tetherLength;
-    public static event Action<PlayerControllerData, Transform> EnteredTetherState;
+    public static event Action<Transform> EnteredTetherState;
 
-    public IsTetheredState(StateMachine parentFsm, PlayerControllerData playerControllerData,
+    public IsTetheredState(StateMachine parentFsm, PlayerController controller,
         Transform tetherEnd) {
         _parentFsm = parentFsm;
-        _controllerData = playerControllerData;
+        _controller = controller;
         _tetherEnd = tetherEnd;
     }
 
     public void Enter() {
-        _tetherLength = Vector3.Distance(_controllerData.rootTransform.position, _tetherEnd.position);
-        EnteredTetherState?.Invoke(_controllerData, _tetherEnd);
+        _tetherLength = Vector3.Distance(_controller.transform.position, _tetherEnd.position);
+        EnteredTetherState?.Invoke(_tetherEnd);
     }
 
     public void Update() {
-        if (!Input.GetMouseButton(1) || _tetherEnd == null) {
-            _parentFsm.PopState();
-            _parentFsm.PushState(new NotTetheredState(_parentFsm, _controllerData, _tetherEnd));
+        if (CheckToUntether()) {
             return;
         }
-        if (Input.GetKey(KeyCode.Space)) {
-            _parentFsm.PopState();
-            _parentFsm.PushState(new IsReelingState(_parentFsm,
-                _controllerData, _tetherEnd, _tetherLength));
+        if (CheckToReel()) {
+            return;
         }
 
-        _controllerData.playerModel.transform.forward =
-            (_tetherEnd.position - _controllerData.rootTransform.position).normalized;
-
-        TetherUtils.UpdateTetherLength(_controllerData, _tetherEnd.position, ref _tetherLength);
+        TetherUtils.UpdateTetherLength(_controller, _tetherEnd.position, ref _tetherLength);
+        RotatePlayerModelToTetherEnd();
     }
 
     public void FixedUpdate() {
         if (_tetherEnd == null) {
             return;
         }
-        TetherUtils.ApplyTetherSpring(_controllerData, _tetherEnd.position, _tetherLength);
+        TetherUtils.ApplyTetherSpring(_controller, _tetherEnd.position, _tetherLength);
     }
 
     public void Exit() {
 
+    }
+
+    private bool CheckToUntether() {
+        if (!Input.GetMouseButton(1) || _tetherEnd == null) {
+            _parentFsm.PopState();
+            _parentFsm.PushState(new NotTetheredState(_parentFsm, _controller, _tetherEnd));
+            return true;
+        }
+        return false;
+    }
+
+    private bool CheckToReel() {
+        if (Input.GetKey(KeyCode.Space)) {
+            _parentFsm.PopState();
+            _parentFsm.PushState(new IsReelingState(_parentFsm, _controller, _tetherEnd, _tetherLength));
+            return true;
+        }
+        return false;
+    }
+
+    private void RotatePlayerModelToTetherEnd() {
+        Vector3 dirToTetherEnd = (_tetherEnd.position - _controller.transform.position).normalized;
+        _controller.PlayerModel.transform.forward = dirToTetherEnd;
     }
 }

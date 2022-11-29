@@ -4,40 +4,48 @@ using System;
 public class BurstBackwardState : IState {
 
     private StateMachine _parentFsm;
-    private PlayerControllerData _controllerData;
+    private PlayerController _controller;
     public static event Action OnBurst;
     public static event Action OnExitBurst;
 
-    public BurstBackwardState(StateMachine parentFsm, PlayerControllerData playerControllerData) {
+    public BurstBackwardState(StateMachine parentFsm, PlayerController controller) {
         _parentFsm = parentFsm;
-        _controllerData = playerControllerData;
+        _controller = controller;
     }
 
     public void Enter() {
         OnBurst?.Invoke();
-        _controllerData.animator.Play("BurstForward");
-        BurstUtils.DampVelocityForBurst(_controllerData, -_controllerData.cam.transform.forward);
+        _controller.PlayerAnimator.Play("BurstForward");
+        BurstUtils.DampVelocityForBurst(_controller, -1f * _controller.Cam.transform.forward);
     }
 
     public void Update() {
         if (!Input.GetKey(KeyCode.S)) {
             _parentFsm.PopState();
-            _parentFsm.PushState(new NotBurstingState(_parentFsm, _controllerData));
+            _parentFsm.PushState(new NotBurstingState(_parentFsm, _controller));
             return;
         }
-
-        _controllerData.playerModel.transform.forward = _controllerData.cam.transform.forward;
-        Vector3 oldEuler = _controllerData.playerModel.transform.eulerAngles;
-        _controllerData.playerModel.transform.rotation = Quaternion.Euler(oldEuler.x + -180f, oldEuler.y, oldEuler.z);
+        RotatePlayerModelBackwards();
     }
 
     public void FixedUpdate() {
-        BurstUtils.BurstInDirection(_controllerData, -_controllerData.cam.transform.forward);
+        BurstUtils.BurstInDirection(_controller, -_controller.Cam.transform.forward);
     }
 
     public void Exit() {
-        Vector3 originalEuler = _controllerData.playerModel.eulerAngles;
-        _controllerData.playerModel.rotation = Quaternion.Euler(180f, originalEuler.y, originalEuler.z);
+        ResetPlayerModelRotation();
         OnExitBurst?.Invoke();
+    }
+
+    private void RotatePlayerModelBackwards() {
+        _controller.PlayerModel.transform.forward = _controller.Cam.transform.forward;
+        Vector3 originalEuler = _controller.PlayerModel.transform.eulerAngles;
+        _controller.PlayerModel.transform.rotation = Quaternion.Euler(originalEuler.x + -180f,
+                                                                      originalEuler.y, originalEuler.z);
+    }
+
+    private void ResetPlayerModelRotation() {
+        Vector3 originalEuler = _controller.PlayerModel.eulerAngles;
+        _controller.PlayerModel.rotation = Quaternion.Euler(180f, originalEuler.y, originalEuler.z);
     }
 }

@@ -2,18 +2,18 @@ using UnityEngine;
 
 public class PlayerMovingState : IState {
     private StateMachine _fsm;
-    private PlayerControllerData _controllerData;
+    private PlayerController _controller;
     private PlayerGroundedState _playerGroundedState;
 
-    public PlayerMovingState(StateMachine parentFsm, PlayerControllerData playerControllerData,
-        PlayerGroundedState playerGroundedState) {
+    public PlayerMovingState(StateMachine parentFsm, PlayerController controller,
+                             PlayerGroundedState playerGroundedState) {
         _fsm = parentFsm;
-        _controllerData = playerControllerData;
+        _controller = controller;
         _playerGroundedState = playerGroundedState;
     }
 
     public void Enter() {
-        _controllerData.animator.Play("Run");
+        _controller.PlayerAnimator.Play("Run");
     }
 
     public void Update() {
@@ -21,23 +21,28 @@ public class PlayerMovingState : IState {
     }
 
     public void FixedUpdate() {
-        Vector3 input = new Vector3(Input.GetAxisRaw("Horizontal"),
-            0f, Input.GetAxisRaw("Vertical"));
-
+        Vector3 input = PlayerControllerUtils.GetRawWASDInput();
         if (input == Vector3.zero) {
             // Apply stopping force before transitioning.
             _fsm.PopState();
-            _fsm.PushState(new PlayerIdleState(_fsm, _controllerData, _playerGroundedState));
+            _fsm.PushState(new PlayerIdleState(_fsm, _controller, _playerGroundedState));
             return;
         }
 
-        Vector3 moveDir = (Quaternion.AngleAxis(
-            _controllerData.cam.transform.eulerAngles.y, Vector3.up) * input).normalized;
+        Vector3 moveDir = GetMoveDirection(input);
+        // Set the desired move direction in the parent grounded state class, which will
+        // apply the movement.
         _playerGroundedState.MoveDir = moveDir;
-        _controllerData.playerModel.rotation = Quaternion.LookRotation(moveDir);
+        _controller.PlayerModel.rotation = Quaternion.LookRotation(moveDir);
     }
 
     public void Exit() {
-        _playerGroundedState.MoveDir = Vector3.zero;
+
+    }
+
+    // Get the direction to move in based on the given WASD input and camera angle.
+    private Vector3 GetMoveDirection(Vector3 input) {
+        return (Quaternion.AngleAxis(_controller.Cam.transform.eulerAngles.y,
+                                     Vector3.up) * input).normalized;
     }
 }

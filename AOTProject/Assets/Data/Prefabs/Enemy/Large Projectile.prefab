@@ -96,7 +96,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _explosionEffect: {fileID: 7685632298508197989}
   _explosionSound: {fileID: 3100082896010898974}
-  _speed: 100
+  _speed: 150
   _aliveTime: 15
   ExplosionRadius: 0
   ExplodePosition: {x: 0, y: 0, z: 0}

@@ -237,7 +237,7 @@ MonoBehaviour:
   _pathfinder: {fileID: 0}
   _repathRate: 30
   _playerMoveDistanceToRepath: 256
-  _agentRadius: 0
+  _agentRadius: 0.35
   _worldOctree: {fileID: 0}
   _playerRb: {fileID: 0}
   _playerTransform: {fileID: 0}
@@ -246,7 +246,7 @@ MonoBehaviour:
   _maxAcceleration: 100
   _attackRange: 100
   _attackReadyingTime: 1
-  _explosionRadius: 10
+  _explosionRadius: 6
   _projectileOrigin: {fileID: 2542930992523057646}
   _projectilePrefab: {fileID: 831507001654905501, guid: 4f2cced7112d3fb4dacd1baa62fc2737,
     type: 3}

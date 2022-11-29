@@ -3,52 +3,47 @@ using UnityEngine;
 public class PlayerInAirState : IState {
     private StateMachine _parentFsm;
     private StateMachine _burstingSubstatesFsm;
-    private StateMachine _tetherFsm;
-    private PlayerControllerData _controllerData;
+    private PlayerController _controller;
 
-    public PlayerInAirState(StateMachine parentFsm, StateMachine tetherFsm,
-        PlayerControllerData playerControllerData) {
+    public PlayerInAirState(StateMachine parentFsm, PlayerController controller) {
         _parentFsm = parentFsm;
-        _tetherFsm = tetherFsm;
-        _controllerData = playerControllerData;
+        _controller = controller;
         _burstingSubstatesFsm = new StateMachine();
-        _burstingSubstatesFsm.PushState(new NotBurstingState(_burstingSubstatesFsm, _controllerData));
+        _burstingSubstatesFsm.PushState(new NotBurstingState(_burstingSubstatesFsm, _controller));
     }
 
     public void Enter() {
-        _controllerData.animator.Play("Falling");
+        _controller.PlayerAnimator.Play("Falling");
     }
 
     public void Update() {
-        _burstingSubstatesFsm.GetCurrentState().Update();
-        _tetherFsm.GetCurrentState().Update();
-        const float errorThreshold = 0.15f;
-        if (Physics.Raycast(_controllerData.rootTransform.position, Vector3.down,
-            out RaycastHit rayHit, _controllerData.groundCheckRayLength,
-            ~LayerMask.GetMask("Player"))) {
-            if (rayHit.distance < _controllerData.floatHeight + errorThreshold) {
-                // No longer in air.
-                _parentFsm.PopState();
-                _parentFsm.PushState(new PlayerGroundedState(_parentFsm,
-                    _tetherFsm, _controllerData));
-            }
-        }
-        if (Input.GetMouseButtonDown(0)) {
-            // _controllerData.playerModel.rotation = Quaternion.LookRotation(_controllerData.cam.transform.forward);
-            // _controllerData.animator.Play("SwordSwingRoll");
-            // PhysicsUtils.ChangeVelocityWithMaxAcceleration(_controllerData.rb, _controllerData.cam.transform.forward,
-            //     _controllerData.maxBurstSpeed, 5000f);
-            _parentFsm.PopState();
-            _parentFsm.PushState(new PlayerAttackingState(_parentFsm, _tetherFsm, _controllerData));
-        }
+        ChangeStatesIfNotInAir();
+        _burstingSubstatesFsm.Update();
+        CheckToAttack();
     }
 
     public void FixedUpdate() {
-        _burstingSubstatesFsm.GetCurrentState().FixedUpdate();
-        _tetherFsm.GetCurrentState().FixedUpdate();
+        _burstingSubstatesFsm.FixedUpdate();
     }
 
     public void Exit() {
         _burstingSubstatesFsm.GetCurrentState().Exit();
+    }
+
+    private void ChangeStatesIfNotInAir() {
+        RaycastHit rayHit = PlayerControllerUtils.PlayerGroundedCheck(_controller);
+        bool isGrounded = rayHit.collider != null;
+        if (isGrounded) {
+            // No longer in air.
+            _parentFsm.PopState();
+            _parentFsm.PushState(new PlayerGroundedState(_parentFsm, _controller));
+        }
+    }
+
+    private void CheckToAttack() {
+        if (Input.GetMouseButtonDown(0)) {
+            _parentFsm.PopState();
+            _parentFsm.PushState(new PlayerAttackingState(_parentFsm, _controller));
+        }
     }
 }

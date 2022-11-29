@@ -1,32 +1,42 @@
 using UnityEngine;
 
+public struct TryTetherResult {
+    public bool tethered;
+    public Transform tetherEnd;
+}
+
 public static class TetherUtils {
     // Try to tether using a raycast from camera center.
-    public static TryTetherResult TryTether(PlayerControllerData controllerData) {
+    public static TryTetherResult TryTether(PlayerController controller) {
         TryTetherResult tetherData = new TryTetherResult {
             tethered = false,
             tetherEnd = null
         };
 
+        // Tether result data
         bool gotHit = false;
         RaycastHit rayHit = new RaycastHit();
+
         // Check if any enemies are in the camera direction with a spherecast.
-        Transform enemyTransform = GetEnemyInTetherDirection(controllerData);
+        Transform enemyTransform = GetEnemyInTetherDirection(controller);
         if (enemyTransform) {
             // Got closest enemy transform, now get closest point on enemy collider
             // to attach to.
-            Vector3 dir = (enemyTransform.position - controllerData.cam.transform.position).normalized;
-            gotHit = Physics.Raycast(controllerData.cam.transform.position, dir,
-                out rayHit, controllerData.maxTetherFireDistance, ~LayerMask.GetMask("Player"));
+            Vector3 dir = (enemyTransform.position - controller.Cam.transform.position).normalized;
+            gotHit = Physics.Raycast(controller.Cam.transform.position, dir,
+                                     out rayHit, controller.ControllerData.MaxTetherFireDistance,
+                                     ~LayerMask.GetMask("Player"));
         }
         if (!gotHit) {
-            // No enemies in camera facing direction. Try a simple raycast to tether to a surface.
+            // Couldn't latch to an enemy in camera facing direction. 
+            // Try a simple raycast to tether to a surface.
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            gotHit = Physics.Raycast(ray, out rayHit,
-                    controllerData.maxTetherFireDistance, ~LayerMask.GetMask("Player"));
+            gotHit = Physics.Raycast(ray, out rayHit, controller.ControllerData.MaxTetherFireDistance,
+                                     ~LayerMask.GetMask("Player"));
         }
 
         if (gotHit) {
+            // Successfully tethered. 
             GameObject tetherEnd = new GameObject();
             tetherEnd.name = "Tether End";
             tetherEnd.transform.position = rayHit.point;
@@ -38,10 +48,17 @@ public static class TetherUtils {
         return tetherData;
     }
 
-    public static Transform GetEnemyInTetherDirection(PlayerControllerData controllerData) {
+    /// <summary>
+    /// Check if any enemies lie in the camera facing direction using a sphere
+    /// cast.
+    /// </summary>
+    /// <param name="controller">The player controller</param>
+    /// <returns>A transform from the hit enemy if a hit occured, null otherwise.</returns>
+    public static Transform GetEnemyInTetherDirection(PlayerController controller) {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        bool hitSomething = Physics.SphereCast(ray, controllerData.enemySphereCastLatchRadius,
-                  out RaycastHit castHit, controllerData.maxTetherFireDistance, LayerMask.GetMask("Enemy"));
+        bool hitSomething = Physics.SphereCast(ray, controller.ControllerData.AimAssistLatchOnRadius,
+                                               out RaycastHit castHit, controller.ControllerData.MaxTetherFireDistance,
+                                               LayerMask.GetMask("Enemy"));
         if (hitSomething) {
             return castHit.transform;
         }
@@ -49,57 +66,54 @@ public static class TetherUtils {
     }
 
     // Keep the player tethered within tether length with a spring force.
-    public static void ApplyTetherSpring(PlayerControllerData controllerData,
-        Vector3 tetherPoint, float tetherLength) {
-        float distance = Vector3.Distance(tetherPoint, controllerData.rootTransform.position);
-        const float errorThreshold = 0.5f;
-        if (distance > tetherLength + errorThreshold) {
+    public static void ApplyTetherSpring(PlayerController controller,
+                                         Vector3 tetherPoint, float tetherLength) {
+        float distanceToTetherEnd = Vector3.Distance(tetherPoint, controller.transform.position);
+        const float ApplySpringThreshold = 0.5f;
+        if (distanceToTetherEnd > tetherLength + ApplySpringThreshold) {
             // Apply spring if player is further away than tether length.
-            Vector3 dir = (tetherPoint - controllerData.rootTransform.position).normalized;
-            float dirVelocity = Vector3.Dot(dir, controllerData.rb.velocity);
-            float springForce = ((controllerData.tetherSpringStrength * distance) -
-                (controllerData.tetherSpringDamper * dirVelocity));
-            if (springForce > 0f) {
-                // Force should only be restorative.
-                controllerData.rb.AddForce(dir * springForce);
-            }
+            Vector3 dirToTetherEnd = (tetherPoint - controller.transform.position).normalized;
+            float velocityInDir = Vector3.Dot(dirToTetherEnd, controller.Rb.velocity);
+            PhysicsUtils.ApplySpringForce(controller.Rb,
+                                          dirToTetherEnd,
+                                          controller.ControllerData.TetherSpringStrength,
+                                          distanceToTetherEnd,
+                                          controller.ControllerData.TetherSpringDamper,
+                                          velocityInDir,
+                                          false, true);
         }
     }
 
     // Reel in the tether direction.
-    public static void ApplyTetherReel(PlayerControllerData controllerData, Vector3 tetherPoint) {
-        Vector3 dir = (tetherPoint - controllerData.rootTransform.position).normalized;
+    public static void ApplyTetherReel(PlayerController controller, Vector3 tetherPoint) {
+        Vector3 reelDir = (tetherPoint - controller.transform.position).normalized;
 
         // Swing a bit to the left or right if A or D is pressed.
         float adInput = Input.GetAxisRaw("Horizontal");
-        float distanceToTether = Vector3.Distance(tetherPoint,
-            controllerData.rootTransform.position);
         if (adInput != 0) {
+            float distanceToTether = Vector3.Distance(tetherPoint, controller.transform.position);
             float rightLeftStrength = Mathf.Clamp01(1f / distanceToTether);
-            Vector3 swing = Vector3.Cross(Vector3.up, dir) *
-                rightLeftStrength * controllerData.horitontalSwingStrength;
+            Vector3 swing = Vector3.Cross(Vector3.up, reelDir) * rightLeftStrength *
+                                          controller.ControllerData.HoritontalSwingStrength;
             if (adInput < 0) {
+                // Negate if for cross product flipping.
                 swing *= -1;
             }
-            dir += swing;
-            dir.Normalize();
+            reelDir += swing;
+            reelDir.Normalize();
         }
 
-        PhysicsUtils.ChangeVelocityWithMaxAcceleration(controllerData.rb, dir,
-            controllerData.maxReelSpeed, controllerData.maxReelAcceleration);
+        Vector3 goalVelocity = reelDir * controller.ControllerData.MaxReelSpeed;
+        PhysicsUtils.ChangeVelocityWithMaxAcceleration(controller.Rb, goalVelocity,
+                                                       controller.ControllerData.MaxReelAcceleration);
     }
 
     // Update the tether length for the current state.
-    public static void UpdateTetherLength(PlayerControllerData controllerData, Vector3 tetherPoint,
-        ref float tetherLength) {
-        float distanceToTether = Vector3.Distance(controllerData.rootTransform.position, tetherPoint);
+    public static void UpdateTetherLength(PlayerController controller, Vector3 tetherPoint,
+                                          ref float tetherLength) {
+        float distanceToTether = Vector3.Distance(controller.transform.position, tetherPoint);
         if (distanceToTether < tetherLength) {
             tetherLength = distanceToTether;
         }
     }
-}
-
-public struct TryTetherResult {
-    public bool tethered;
-    public Transform tetherEnd;
 }

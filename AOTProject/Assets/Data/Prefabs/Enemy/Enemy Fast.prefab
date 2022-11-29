@@ -128,7 +128,7 @@ MonoBehaviour:
   _pathfinder: {fileID: 0}
   _repathRate: 8
   _playerMoveDistanceToRepath: 50
-  _agentRadius: 0
+  _agentRadius: 0.35
   _worldOctree: {fileID: 0}
   _playerRb: {fileID: 0}
   _playerTransform: {fileID: 0}

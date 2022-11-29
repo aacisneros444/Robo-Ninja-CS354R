@@ -4,38 +4,38 @@ using System;
 public class BurstForwardState : IState {
 
     private StateMachine _parentFsm;
-    private PlayerControllerData _controllerData;
+    private PlayerController _controller;
     public static event Action OnBurst;
     public static event Action OnExitBurst;
 
-    public BurstForwardState(StateMachine parentFsm, PlayerControllerData playerControllerData) {
+    public BurstForwardState(StateMachine parentFsm, PlayerController controller) {
         _parentFsm = parentFsm;
-        _controllerData = playerControllerData;
+        _controller = controller;
     }
 
     public void Enter() {
         OnBurst?.Invoke();
-        _controllerData.animator.Play("BurstForward");
-        BurstUtils.DampVelocityForBurst(_controllerData, _controllerData.cam.transform.forward);
+        _controller.PlayerAnimator.Play("BurstForward");
+        BurstUtils.DampVelocityForBurst(_controller, _controller.Cam.transform.forward);
     }
 
     public void Update() {
         if (!Input.GetKey(KeyCode.W)) {
             _parentFsm.PopState();
-            _parentFsm.PushState(new NotBurstingState(_parentFsm, _controllerData));
+            _parentFsm.PushState(new NotBurstingState(_parentFsm, _controller));
             return;
         }
 
-        _controllerData.playerModel.transform.forward = _controllerData.cam.transform.forward;
+        _controller.PlayerModel.transform.forward = _controller.Cam.transform.forward;
     }
 
     public void FixedUpdate() {
-        BurstUtils.BurstInDirection(_controllerData, _controllerData.cam.transform.forward);
+        BurstUtils.BurstInDirection(_controller, _controller.Cam.transform.forward);
     }
 
     public void Exit() {
-        Vector3 originalEuler = _controllerData.playerModel.eulerAngles;
-        _controllerData.playerModel.rotation = Quaternion.Euler(0f, originalEuler.y, originalEuler.z);
+        Vector3 originalEuler = _controller.PlayerModel.eulerAngles;
+        _controller.PlayerModel.rotation = Quaternion.Euler(0f, originalEuler.y, originalEuler.z);
         OnExitBurst?.Invoke();
     }
 }

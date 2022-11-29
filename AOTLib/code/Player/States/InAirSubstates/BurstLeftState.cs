@@ -4,32 +4,31 @@ using System;
 public class BurstLeftState : IState {
 
     private StateMachine _parentFsm;
-    private PlayerControllerData _controllerData;
+    private PlayerController _controller;
     public static event Action OnBurst;
     public static event Action OnExitBurst;
 
-    public BurstLeftState(StateMachine parentFsm, PlayerControllerData playerControllerData) {
+    public BurstLeftState(StateMachine parentFsm, PlayerController controller) {
         _parentFsm = parentFsm;
-        _controllerData = playerControllerData;
+        _controller = controller;
     }
 
     public void Enter() {
         OnBurst?.Invoke();
-        _controllerData.animator.Play("BurstSideLeft");
-        BurstUtils.DampVelocityForBurst(_controllerData, -_controllerData.cam.transform.right);
+        _controller.PlayerAnimator.Play("BurstSideLeft");
+        BurstUtils.DampVelocityForBurst(_controller, -1f * _controller.Cam.transform.right);
     }
 
     public void Update() {
         if (!Input.GetKey(KeyCode.A)) {
             _parentFsm.PopState();
-            _parentFsm.PushState(new NotBurstingState(_parentFsm, _controllerData));
+            _parentFsm.PushState(new NotBurstingState(_parentFsm, _controller));
         }
-
-        _controllerData.playerModel.transform.right = _controllerData.cam.transform.right;
+        _controller.PlayerModel.transform.right = _controller.Cam.transform.right;
     }
 
     public void FixedUpdate() {
-        BurstUtils.BurstInDirection(_controllerData, -_controllerData.cam.transform.right);
+        BurstUtils.BurstInDirection(_controller, -1f * _controller.Cam.transform.right);
     }
 
     public void Exit() {

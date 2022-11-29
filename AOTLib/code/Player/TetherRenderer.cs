@@ -5,7 +5,7 @@ public class TetherRenderer : MonoBehaviour {
     [SerializeField] private LineRenderer _rightlineRenderer;
     // refactor out
     [SerializeField] private AudioSource _onTetherSound;
-    private PlayerControllerData _controllerData;
+    [SerializeField] private PlayerController _controller;
     private Transform _tetherEnd;
     private bool _isTethered = false;
 
@@ -20,10 +20,10 @@ public class TetherRenderer : MonoBehaviour {
 
     private void Update() {
         if (_isTethered && _tetherEnd != null) {
-            UpdateLineRenderer(_leftlineRenderer,
-                _controllerData.rightTetherOrigin.position, _tetherEnd.position);
-            UpdateLineRenderer(_rightlineRenderer,
-                _controllerData.leftTetherOrigin.position, _tetherEnd.position);
+            UpdateLineRenderer(_leftlineRenderer, _controller.RightTetherOrigin.position,
+                               _tetherEnd.position);
+            UpdateLineRenderer(_rightlineRenderer, _controller.LeftTetherOrigin.position,
+                               _tetherEnd.position);
         }
     }
 
@@ -34,10 +34,9 @@ public class TetherRenderer : MonoBehaviour {
         lineRenderer.SetPositions(tetherPoints);
     }
 
-    private void OnTether(PlayerControllerData controllerData, Transform tetherEnd) {
+    private void OnTether(Transform tetherEnd) {
         _isTethered = true;
         _tetherEnd = tetherEnd;
-        _controllerData = controllerData;
         _onTetherSound.Play();
     }
 

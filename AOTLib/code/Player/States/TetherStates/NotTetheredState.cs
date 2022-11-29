@@ -4,14 +4,13 @@ using System;
 public class NotTetheredState : IState {
 
     private StateMachine _parentFsm;
-    private PlayerControllerData _controllerData;
+    private PlayerController _controller;
     private Transform _tetherEnd;
     public static event Action ExitedTetherState;
 
-    public NotTetheredState(StateMachine parentFsm, PlayerControllerData playerControllerData,
-        Transform tetherEnd) {
+    public NotTetheredState(StateMachine parentFsm, PlayerController controller, Transform tetherEnd) {
         _parentFsm = parentFsm;
-        _controllerData = playerControllerData;
+        _controller = controller;
         _tetherEnd = tetherEnd;
     }
 
@@ -23,14 +22,7 @@ public class NotTetheredState : IState {
     }
 
     public void Update() {
-        if (Input.GetMouseButtonDown(1)) {
-            TryTetherResult tryTetherResult = TetherUtils.TryTether(_controllerData);
-            if (tryTetherResult.tethered) {
-                _parentFsm.PopState();
-                _parentFsm.PushState(new IsTetheredState(_parentFsm,
-                    _controllerData, tryTetherResult.tetherEnd));
-            }
-        }
+        CheckToTether();
     }
 
     public void FixedUpdate() {
@@ -39,5 +31,15 @@ public class NotTetheredState : IState {
 
     public void Exit() {
 
+    }
+
+    private void CheckToTether() {
+        if (Input.GetMouseButtonDown(1)) {
+            TryTetherResult tryTetherResult = TetherUtils.TryTether(_controller);
+            if (tryTetherResult.tethered) {
+                _parentFsm.PopState();
+                _parentFsm.PushState(new IsTetheredState(_parentFsm, _controller, tryTetherResult.tetherEnd));
+            }
+        }
     }
 }

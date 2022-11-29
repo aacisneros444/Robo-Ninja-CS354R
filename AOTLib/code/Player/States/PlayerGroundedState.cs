@@ -3,59 +3,39 @@ using UnityEngine;
 public class PlayerGroundedState : IState {
     private StateMachine _parentFsm;
     private StateMachine _groundedSubstatesFsm;
-    private StateMachine _tetherFsm;
-    private PlayerControllerData _controllerData;
+    private PlayerController _controller;
+    // The current direction to move the player.
     public Vector3 MoveDir;
     private bool _jumped;
 
-    public PlayerGroundedState(StateMachine parentFsm, StateMachine tetherFsm,
-        PlayerControllerData playerControllerData) {
+    public PlayerGroundedState(StateMachine parentFsm, PlayerController controller) {
         _parentFsm = parentFsm;
-        _controllerData = playerControllerData;
+        _controller = controller;
         _groundedSubstatesFsm = new StateMachine();
-        _groundedSubstatesFsm.PushState(new PlayerIdleState(_groundedSubstatesFsm, _controllerData, this));
-        _tetherFsm = tetherFsm;
+        _groundedSubstatesFsm.PushState(new PlayerIdleState(_groundedSubstatesFsm, _controller, this));
     }
 
     public void Enter() {
-        Vector3 originalEuler = _controllerData.playerModel.transform.eulerAngles;
-        _controllerData.playerModel.transform.rotation = Quaternion.Euler(0f, originalEuler.y, originalEuler.z);
+        Vector3 originalEuler = _controller.PlayerModel.transform.eulerAngles;
+        _controller.PlayerModel.transform.rotation = Quaternion.Euler(0f, originalEuler.y, originalEuler.z);
     }
 
     public void Update() {
-        _groundedSubstatesFsm.GetCurrentState().Update();
-        _tetherFsm.GetCurrentState().Update();
-        const float errorThreshold = 0.15f;
-        if (!Physics.Raycast(_controllerData.rootTransform.position, Vector3.down,
-            _controllerData.floatHeight + errorThreshold, ~LayerMask.GetMask("Player"))) {
-            // No longer grounded.
-            _parentFsm.PopState();
-            _parentFsm.PushState(new PlayerInAirState(_parentFsm,
-                _tetherFsm, _controllerData));
-        }
-        if (Input.GetKeyDown(KeyCode.E) && !_jumped) {
-            _jumped = true;
-        }
-        if (Input.GetMouseButtonDown(0)) {
-            // _controllerData.playerModel.rotation = Quaternion.LookRotation(_controllerData.cam.transform.forward);
-            // _controllerData.animator.Play("SwordSwingRoll");
-            // PhysicsUtils.ChangeVelocityWithMaxAcceleration(_controllerData.rb, _controllerData.cam.transform.forward,
-            //     _controllerData.maxBurstSpeed, 5000f);
-            _parentFsm.PopState();
-            _parentFsm.PushState(new PlayerAttackingState(_parentFsm, _tetherFsm, _controllerData));
-        }
+        ChangeStatesIfNotGrounded();
+        _groundedSubstatesFsm.Update();
+        CheckToJump();
+        CheckToAttack();
     }
 
     public void FixedUpdate() {
-        _groundedSubstatesFsm.GetCurrentState().FixedUpdate();
-        _tetherFsm.GetCurrentState().FixedUpdate();
+        _groundedSubstatesFsm.FixedUpdate();
+        ApplyFloatForce();
         if (_jumped) {
             _jumped = false;
             ApplyJumpForce();
         }
-        ApplyFloatForce();
-        if (_tetherFsm.GetCurrentState().GetType() != typeof(IsReelingState)) {
-            ApplyMovement(MoveDir);
+        if (_controller.TetherFsm.GetCurrentState().GetType() != typeof(IsReelingState)) {
+            ApplyMovement();
         }
     }
 
@@ -63,59 +43,75 @@ public class PlayerGroundedState : IState {
 
     }
 
-    private void ApplyFloatForce() {
-        if (Physics.Raycast(_controllerData.rootTransform.position, Vector3.down,
-            out RaycastHit rayHit, _controllerData.groundCheckRayLength)) {
-            if (rayHit.distance < _controllerData.floatHeight) {
-                Vector3 hitRbVelocity = Vector3.zero;
-                if (rayHit.rigidbody != null) {
-                    hitRbVelocity = rayHit.rigidbody.velocity;
-                }
-
-                // Find the amount of velocity in the direction of the raycast
-                // for our own rigidbody and a rigidbody we may have hit.
-                float downVelocity = Vector3.Dot(Vector3.down, _controllerData.rb.velocity);
-                float otherRbVelocity = Vector3.Dot(Vector3.down, hitRbVelocity);
-
-                float relativeVelocity = downVelocity - otherRbVelocity;
-
-                float x = rayHit.distance - _controllerData.floatHeight;
-                // spring formula: f = -kx-bv
-                // where f is force to apply, k is spring stiffness, x is displacement,
-                // b is dampening value, and v is velocity
-                float springForce = -1 * ((_controllerData.floatSpringStrength * x) -
-                    (_controllerData.floatSpringDamper * relativeVelocity));
-                _controllerData.rb.AddForce(Vector3.up * springForce);
-            }
+    private void ChangeStatesIfNotGrounded() {
+        RaycastHit rayHit = PlayerControllerUtils.PlayerGroundedCheck(_controller);
+        bool isGrounded = rayHit.collider != null;
+        if (!isGrounded) {
+            // No longer grounded.
+            _parentFsm.PopState();
+            _parentFsm.PushState(new PlayerInAirState(_parentFsm, _controller));
         }
     }
 
-    private void ApplyMovement(Vector3 direction) {
+    private void CheckToJump() {
+        if (Input.GetKeyDown(KeyCode.E) && !_jumped) {
+            _jumped = true;
+        }
+    }
+
+    private void CheckToAttack() {
+        if (Input.GetMouseButtonDown(0)) {
+            _parentFsm.PopState();
+            _parentFsm.PushState(new PlayerAttackingState(_parentFsm, _controller));
+        }
+    }
+
+    private void ApplyFloatForce() {
+        RaycastHit rayHit = PlayerControllerUtils.HitGroundCheck(_controller);
+        if (rayHit.collider == null) {
+            // Did not hit ground, shouldn't apply float force.
+            return;
+        }
+
+        if (rayHit.distance < _controller.ControllerData.FloatHeight) {
+            Vector3 hitRbVelocity = Vector3.zero;
+            if (rayHit.rigidbody != null) {
+                hitRbVelocity = rayHit.rigidbody.velocity;
+            }
+
+            // Find the amount of velocity in the direction of the raycast
+            // for our own rigidbody and a rigidbody we may have hit.
+            float downVelocity = Vector3.Dot(Vector3.down, _controller.Rb.velocity);
+            float otherRbVelocity = Vector3.Dot(Vector3.down, hitRbVelocity);
+            float relativeVelocity = downVelocity - otherRbVelocity;
+
+            float x = rayHit.distance - _controller.ControllerData.FloatHeight;
+            PhysicsUtils.ApplySpringForce(_controller.Rb, Vector3.up,
+                                          _controller.ControllerData.FloatSpringStrength,
+                                          x, _controller.ControllerData.FloatSpringDamper,
+                                          relativeVelocity, true, false);
+        }
+    }
+
+    private void ApplyMovement() {
         // Determine if character is on a rigidbody to
         // save that body's velocity. It will need to
         // be applied to the character (think 
         // moving platform).
-        RaycastHit rayHit;
+        RaycastHit rayHit = PlayerControllerUtils.HitGroundCheck(_controller);
         Vector3 groundVelocity = Vector3.zero;
-        if (Physics.Raycast(_controllerData.rootTransform.position,
-            Vector3.down, out rayHit, _controllerData.groundCheckRayLength)) {
-            if (rayHit.rigidbody != null) {
-                groundVelocity = rayHit.rigidbody.velocity;
-            }
-        } else {
-            // Can't move while not grounded.
-            return;
+        bool hitGround = rayHit.collider != null;
+        if (hitGround && rayHit.rigidbody != null) {
+            groundVelocity = rayHit.rigidbody.velocity;
         }
-        Vector3 goalVelocity = (direction.normalized * _controllerData.maxSpeed) + groundVelocity;
-        Vector3 oldRbVelocity = new Vector3(_controllerData.rb.velocity.x, 0f,
-            _controllerData.rb.velocity.z);
-        Vector3 goalAccel = (goalVelocity - oldRbVelocity) / Time.fixedDeltaTime;
-        goalAccel = Vector3.ClampMagnitude(goalAccel, _controllerData.maxAcceleration);
-        // F=ma
-        _controllerData.rb.AddForce(_controllerData.rb.mass * goalAccel);
+
+        Vector3 currVelocity = new Vector3(_controller.Rb.velocity.x, 0f, _controller.Rb.velocity.z);
+        Vector3 goalVelocity = (MoveDir * _controller.ControllerData.GroundedMaxSpeed) + groundVelocity;
+        PhysicsUtils.ChangeVelocityWithMaxAcceleration(_controller.Rb, currVelocity, goalVelocity,
+                                                       _controller.ControllerData.GroundedMaxAcceleration);
     }
 
     private void ApplyJumpForce() {
-        _controllerData.rb.AddForce(Vector3.up * _controllerData.jumpStrength);
+        _controller.Rb.AddForce(Vector3.up * _controller.ControllerData.JumpStrength);
     }
 }

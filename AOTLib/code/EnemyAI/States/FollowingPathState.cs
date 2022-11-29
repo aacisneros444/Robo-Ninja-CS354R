@@ -71,8 +71,9 @@ public class FollowingPathState : IState {
         }
         Vector3 dirToWaypoint =
             (_path[_pathIndex] - _controllerData.rootTransform.position).normalized;
-        PhysicsUtils.ChangeVelocityWithMaxAcceleration(_controllerData.rb,
-            dirToWaypoint, _controllerData.maxSpeed, _controllerData.maxAcceleration);
+        Vector3 goalVelocity = dirToWaypoint * _controllerData.maxSpeed;
+        PhysicsUtils.ChangeVelocityWithMaxAcceleration(_controllerData.rb, goalVelocity,
+                                                       _controllerData.maxAcceleration);
     }
 
     public void Exit() {
