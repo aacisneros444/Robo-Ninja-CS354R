@@ -26,6 +26,7 @@ public class PlayerCamera : MonoBehaviour {
     [SerializeField] private float _sensitivity = 3f;
 
     private void Start() {
+        transform.parent = null;
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }

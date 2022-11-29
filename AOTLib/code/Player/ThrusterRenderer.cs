@@ -1,8 +1,8 @@
 using UnityEngine;
 
 public class ThursterRenderer : MonoBehaviour {
-    [SerializeField] private TrailRenderer _rightR;
-    [SerializeField] private TrailRenderer _leftR;
+    [SerializeField] private TrailRenderer _rightTrail;
+    [SerializeField] private TrailRenderer _leftTrail;
     // refactor out
     [SerializeField] private AudioSource _tetherReelingSound;
     [SerializeField] private Rigidbody _playerRb;
@@ -27,8 +27,8 @@ public class ThursterRenderer : MonoBehaviour {
     }
 
     private void Start() {
-        _rightR.emitting = false;
-        _leftR.emitting = false;
+        _rightTrail.emitting = false;
+        _leftTrail.emitting = false;
     }
 
     private void Update() {
@@ -39,10 +39,10 @@ public class ThursterRenderer : MonoBehaviour {
     }
 
     private void OnThrustRequired() {
-        _rightR.Clear();
-        _leftR.Clear();
-        _rightR.emitting = true;
-        _leftR.emitting = true;
+        _rightTrail.Clear();
+        _leftTrail.Clear();
+        _rightTrail.emitting = true;
+        _leftTrail.emitting = true;
         _numThrusterStates++;
         // refactor sound out
         if (_numThrusterStates == 1) {
@@ -55,8 +55,8 @@ public class ThursterRenderer : MonoBehaviour {
     private void OnThurstStop() {
         _numThrusterStates--;
         if (_numThrusterStates == 0) {
-            _rightR.emitting = false;
-            _leftR.emitting = false;
+            _rightTrail.emitting = false;
+            _leftTrail.emitting = false;
             _tetherReelingSound.Stop();
         } else if (_numThrusterStates == -1) {
             _numThrusterStates = 0;

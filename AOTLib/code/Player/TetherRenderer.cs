@@ -1,8 +1,8 @@
 using UnityEngine;
 
 public class TetherRenderer : MonoBehaviour {
-    [SerializeField] private LineRenderer _leftlineRenderer;
-    [SerializeField] private LineRenderer _rightlineRenderer;
+    [SerializeField] private LineRenderer _leftLineRenderer;
+    [SerializeField] private LineRenderer _rightLineRenderer;
     // refactor out
     [SerializeField] private AudioSource _onTetherSound;
     [SerializeField] private PlayerController _controller;
@@ -20,9 +20,9 @@ public class TetherRenderer : MonoBehaviour {
 
     private void Update() {
         if (_isTethered && _tetherEnd != null) {
-            UpdateLineRenderer(_leftlineRenderer, _controller.RightTetherOrigin.position,
+            UpdateLineRenderer(_leftLineRenderer, _controller.RightTetherOrigin.position,
                                _tetherEnd.position);
-            UpdateLineRenderer(_rightlineRenderer, _controller.LeftTetherOrigin.position,
+            UpdateLineRenderer(_rightLineRenderer, _controller.LeftTetherOrigin.position,
                                _tetherEnd.position);
         }
     }
@@ -42,7 +42,7 @@ public class TetherRenderer : MonoBehaviour {
 
     private void OnDetachTether() {
         _isTethered = false;
-        UpdateLineRenderer(_leftlineRenderer, Vector3.zero, Vector3.zero);
-        UpdateLineRenderer(_rightlineRenderer, Vector3.zero, Vector3.zero);
+        UpdateLineRenderer(_leftLineRenderer, Vector3.zero, Vector3.zero);
+        UpdateLineRenderer(_rightLineRenderer, Vector3.zero, Vector3.zero);
     }
 }

@@ -45,7 +45,7 @@ public class IsReelingState : IState {
 
     public void Exit() {
         OnStopReeling?.Invoke();
-        if (!(_controller.MainFsm.GetCurrentState().GetType() != typeof(PlayerAttackingState))) {
+        if (_controller.MainFsm.GetCurrentState().GetType() != typeof(PlayerAttackingState)) {
             _controller.PlayerAnimator.Play("Falling");
         }
     }
