@@ -5,6 +5,8 @@ public class EnemyFSM : MonoBehaviour {
     [Header("Pathfinding")]
     [SerializeField] private OctreePathfinder _pathfinder;
     [SerializeField] private float _repathRate;
+    [SerializeField] private float _playerMoveDistanceToRepath;
+    [SerializeField] private float _agentRadius;
     [Header("Targeting")]
     [SerializeField] private Octree _worldOctree;
     [SerializeField] private Rigidbody _playerRb;
@@ -34,6 +36,8 @@ public class EnemyFSM : MonoBehaviour {
             worldOctree = _worldOctree,
             pathFinder = _pathfinder,
             repathRate = _repathRate,
+            playerMoveDistanceToRepath = _playerMoveDistanceToRepath,
+            agentRadius = _agentRadius,
             rb = _rb,
             rootTransform = transform,
             playerRb = _playerRb,
@@ -69,6 +73,8 @@ public class EnemyControllerData {
     public Octree worldOctree;
     public OctreePathfinder pathFinder;
     public float repathRate;
+    public float playerMoveDistanceToRepath;
+    public float agentRadius;
     public Rigidbody rb;
     public Transform rootTransform;
     public Rigidbody playerRb;

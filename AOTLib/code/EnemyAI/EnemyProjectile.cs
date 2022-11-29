@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class EnemyProjectile : MonoBehaviour {
     [SerializeField] private ParticleSystem _explosionEffect;
+    [SerializeField] private AudioSource _explosionSound;
     [SerializeField] private float _speed;
     [SerializeField] private float _aliveTime;
     private float _aliveTimeElapsed;
@@ -42,9 +43,15 @@ public class EnemyProjectile : MonoBehaviour {
             ExplosionRadius, LayerMask.GetMask("Player"));
         if (colliders.Length > 0) {
             Debug.Log("Hit player!");
+            // replace, ugly
+            Rigidbody playerRb = colliders[0].transform.parent.parent.GetComponent<Rigidbody>();
+            Vector3 dirToPlayer = (colliders[0].transform.position - transform.position).normalized;
+            playerRb.AddForce(dirToPlayer * 16000f);
         }
 
         GetComponent<MeshRenderer>().enabled = false;
+        _explosionSound.Play();
+        _explosionSound.pitch = Random.Range(1.8f, 3f);
         _explosionEffect.gameObject.SetActive(true);
         _explosionEffect.Play();
         foreach (Transform child in _explosionEffect.transform) {

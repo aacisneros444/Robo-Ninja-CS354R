@@ -21,12 +21,12 @@ public class NoDestinationState : IState {
         if (_timeSinceLastRepath > _controllerData.repathRate) {
             List<Vector3> path = null;
             while (path == null) {
-                Vector3 destination = GetDestinationCloseToPlayer();
+                Vector3 destination = GetDestinationAroundPlayer();
                 path = _controllerData.pathFinder.GetPath(_controllerData.rootTransform.position,
-                    destination);
+                    destination, _controllerData.agentRadius);
             }
             // Make a beeline if end of path in sight.
-            if (EnemyUtils.HasLineOfSightToPosition(_controllerData, path[path.Count - 1])) {
+            if (EnemyUtils.HasStraightPathToPosition(_controllerData, path[path.Count - 1])) {
                 List<Vector3> newPath = new List<Vector3>();
                 newPath.Add(_controllerData.rootTransform.position);
                 newPath.Add(path[path.Count - 1]);
@@ -44,7 +44,7 @@ public class NoDestinationState : IState {
         }
     }
 
-    private Vector3 GetDestinationCloseToPlayer() {
+    private Vector3 GetDestinationAroundPlayer() {
         Vector3 destinationOffset = Random.insideUnitSphere *
                    _controllerData.destinationOffsetFromPlayer;
         return _controllerData.playerTransform.position + destinationOffset;

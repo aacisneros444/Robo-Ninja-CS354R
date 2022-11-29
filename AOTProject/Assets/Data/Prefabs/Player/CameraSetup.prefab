@@ -132,7 +132,7 @@ MonoBehaviour:
   _follow: {fileID: 0}
   _cameraCenter: {fileID: 6464116944648610597}
   _orbiter: {fileID: 6464116944280355000}
-  _zOffset: -4
+  _zOffset: -3.5
   _yOffset: 1.15
   _orbitRadius: 0.8
   _sensitivity: 3

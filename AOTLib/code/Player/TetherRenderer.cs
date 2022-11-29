@@ -3,6 +3,8 @@ using UnityEngine;
 public class TetherRenderer : MonoBehaviour {
     [SerializeField] private LineRenderer _leftlineRenderer;
     [SerializeField] private LineRenderer _rightlineRenderer;
+    // refactor out
+    [SerializeField] private AudioSource _onTetherSound;
     private PlayerControllerData _controllerData;
     private Transform _tetherEnd;
     private bool _isTethered = false;
@@ -36,6 +38,7 @@ public class TetherRenderer : MonoBehaviour {
         _isTethered = true;
         _tetherEnd = tetherEnd;
         _controllerData = controllerData;
+        _onTetherSound.Play();
     }
 
     private void OnDetachTether() {

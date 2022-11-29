@@ -9,12 +9,18 @@ public class OctreePathfinder : MonoBehaviour {
 
     [SerializeField] private Octree _octree;
 
-    public List<Vector3> GetPath(Vector3 start, Vector3 end) {
+    public List<Vector3> GetPath(Vector3 start, Vector3 end, float agentRadius) {
+        float agentDiameter = agentRadius * 2f;
         if (!_octree.Root.NodeBounds.Contains(start)) {
             start = _octree.Root.NodeBounds.ClosestPoint(start);
         }
         if (!_octree.Root.NodeBounds.Contains(end)) {
             end = _octree.Root.NodeBounds.ClosestPoint(end);
+            if (end.y < agentDiameter) {
+                float originalY = end.y;
+                // Agent will try to go into the ground, clamp end y value.
+                end = new Vector3(end.x, agentDiameter, end.z);
+            }
         }
         SimplePriorityQueue<OctreeNode> frontier = new SimplePriorityQueue<OctreeNode>();
         Dictionary<OctreeNode, OctreeNode> cameFrom = new Dictionary<OctreeNode, OctreeNode>();
@@ -23,7 +29,12 @@ public class OctreePathfinder : MonoBehaviour {
         OctreeNode startNode = _octree.Root.GetClosestEmptyLeafNode(start);
         OctreeNode goal = _octree.Root.GetClosestEmptyLeafNode(end);
         if (!goal.NodeBounds.Contains(end)) {
+            // Our goal node did not contain the original ending position.
+            // Find the closest point in the goal node, and apply an offset
+            // for agent radius.
             end = goal.NodeBounds.ClosestPoint(end);
+            Vector3 dirToGoal = (goal.NodeBounds.center - end).normalized;
+            end += (dirToGoal * agentDiameter);
         }
 
         int numSearched = 0;

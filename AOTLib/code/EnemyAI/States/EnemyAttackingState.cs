@@ -31,8 +31,12 @@ public class EnemyAttackingState : IState {
 
     private void GenerateAttackPoint() {
         Vector3 predictedPos = _controllerData.playerTransform.position +
-            _controllerData.playerRb.velocity * Time.fixedDeltaTime;
-        _attackPosition = predictedPos + Random.insideUnitSphere * Random.Range(0f, 20f);
+            _controllerData.playerRb.velocity * _controllerData.attackReadyingTime;
+        // refactor, 15f should be player's max speed
+        float randomnessMultiplier = _controllerData.playerRb.velocity.magnitude / 15f;
+        Vector3 randomOffset = Random.insideUnitSphere * Random.Range(0f, 15f * randomnessMultiplier);
+        _attackPosition = predictedPos + randomOffset;
+
         if (!_controllerData.worldOctree.Root.NodeBounds.Contains(_attackPosition)) {
             _attackPosition = _controllerData.worldOctree.Root.NodeBounds.ClosestPoint(_attackPosition);
         }

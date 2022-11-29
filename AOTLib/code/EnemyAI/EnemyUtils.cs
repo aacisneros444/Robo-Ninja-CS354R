@@ -1,11 +1,13 @@
 using UnityEngine;
 
 public static class EnemyUtils {
-    public static bool HasLineOfSightToPosition(EnemyControllerData controllerData,
-        Vector3 targetPosition) {
-        Vector3 dir = (targetPosition - controllerData.rootTransform.position).normalized;
-        const float raycastDistance = 250f;
-        return !Physics.Raycast(controllerData.rootTransform.position, dir,
-            raycastDistance, ~LayerMask.GetMask("Enemy"));
+    public static bool HasStraightPathToPosition(EnemyControllerData controllerData,
+                                                 Vector3 targetPosition) {
+        Vector3 toTarget = targetPosition - controllerData.rootTransform.position;
+        Vector3 dir = toTarget.normalized;
+        float castDistance = toTarget.magnitude;
+        return !Physics.SphereCast(controllerData.rootTransform.position,
+            controllerData.agentRadius, dir, out RaycastHit hit,
+            castDistance, ~LayerMask.GetMask("Enemy"));
     }
 }

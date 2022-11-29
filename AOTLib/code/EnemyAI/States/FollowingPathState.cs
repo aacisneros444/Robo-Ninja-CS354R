@@ -45,7 +45,8 @@ public class FollowingPathState : IState {
 
 
         // Repath if player has moved too much.
-        if (Vector3.Distance(_playerPositionOnStateEnter, _controllerData.playerTransform.position) > 50f) {
+        float distanceToPlayer = Vector3.Distance(_playerPositionOnStateEnter, _controllerData.playerTransform.position);
+        if (distanceToPlayer > _controllerData.playerMoveDistanceToRepath) {
             _parentFsm.PopState();
             _parentFsm.PushState(new NoDestinationState(_parentFsm, _controllerData, _controllerData.repathRate));
             return;
@@ -80,7 +81,7 @@ public class FollowingPathState : IState {
 
     private void TryTakeStraightPathToDestination() {
         if (_pathIndex != _path.Count &&
-            EnemyUtils.HasLineOfSightToPosition(_controllerData, _path[_path.Count - 1])) {
+            EnemyUtils.HasStraightPathToPosition(_controllerData, _path[_path.Count - 1])) {
             List<Vector3> newPath = new List<Vector3>();
             newPath.Add(_controllerData.rootTransform.position);
             newPath.Add(_path[_path.Count - 1]);
