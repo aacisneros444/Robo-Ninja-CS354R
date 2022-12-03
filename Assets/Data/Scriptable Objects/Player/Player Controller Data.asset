@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4158f221ae892d40850646ec40fb7a1, type: 3}
+  m_Name: Player Controller Data
+  m_EditorClassIdentifier: 
+  _groundCheckRayLength: 1
+  _floatHeight: 0.5
+  _floatSpringStrength: 4000
+  _floatSpringDamper: 250
+  _groundedMaxSpeed: 7
+  _groundedMaxAcceleration: 150
+  _jumpStrength: 2700
+  _burstStartDampFactor: 0.5
+  _maxBurstSpeed: 22
+  _maxBurstAcceleration: 75
+  _maxTetherFireDistance: 150
+  _tetherSpringStrength: 250
+  _tetherSpringDamper: 200
+  _maxReelSpeed: 28
+  _maxReelAcceleration: 55
+  _horitontalSwingStrength: 17
+  _aimAssistLatchOnRadius: 2.5
