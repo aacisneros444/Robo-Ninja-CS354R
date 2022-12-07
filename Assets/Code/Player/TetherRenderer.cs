@@ -12,10 +12,13 @@ public class TetherRenderer : MonoBehaviour {
     private void Awake() {
         NotTetheredState.ExitedTetherState += OnDetachTether;
         IsTetheredState.EnteredTetherState += OnTether;
+        Health.PlayerDied += OnDetachTether;
     }
 
     private void OnDestroy() {
+        NotTetheredState.ExitedTetherState -= OnDetachTether;
         IsTetheredState.EnteredTetherState -= OnTether;
+        Health.PlayerDied -= OnDetachTether;
     }
 
     private void Update() {

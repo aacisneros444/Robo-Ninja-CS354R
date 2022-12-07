@@ -5,6 +5,7 @@ public class EnemyProjectile : MonoBehaviour {
     [SerializeField] private AudioSource _explosionSound;
     [SerializeField] private float _speed;
     [SerializeField] private float _aliveTime;
+    [SerializeField] private int _damage = 1;
     private float _aliveTimeElapsed;
     private bool _exploded;
     [HideInInspector] public float ExplosionRadius;
@@ -24,7 +25,8 @@ public class EnemyProjectile : MonoBehaviour {
             Explode();
             return;
         }
-        if (Vector3.Distance(transform.position, ExplodePosition) < 1f) {
+
+        if (Vector3.Distance(transform.position, ExplodePosition) < 1.5f) {
             Explode();
             return;
         }
@@ -42,7 +44,9 @@ public class EnemyProjectile : MonoBehaviour {
         Collider[] colliders = Physics.OverlapSphere(transform.position,
             ExplosionRadius, LayerMask.GetMask("Player"));
         if (colliders.Length > 0) {
-            Debug.Log("Hit player!");
+            // replace, ugly
+            Health playerHealth = colliders[0].transform.parent.parent.GetComponent<Health>();
+            playerHealth.DealDamage(_damage);
             // replace, ugly
             Rigidbody playerRb = colliders[0].transform.parent.parent.GetComponent<Rigidbody>();
             Vector3 dirToPlayer = (colliders[0].transform.position - transform.position).normalized;

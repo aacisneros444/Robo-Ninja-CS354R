@@ -1,9 +1,11 @@
 using UnityEngine;
+using System;
 
 public class PlayerMovingState : IState {
     private StateMachine _fsm;
     private PlayerController _controller;
     private PlayerGroundedState _playerGroundedState;
+    public static event Action EnteredState;
 
     public PlayerMovingState(StateMachine parentFsm, PlayerController controller,
                              PlayerGroundedState playerGroundedState) {
@@ -14,6 +16,7 @@ public class PlayerMovingState : IState {
 
     public void Enter() {
         _controller.PlayerAnimator.Play("Run");
+        EnteredState?.Invoke();
     }
 
     public void Update() {

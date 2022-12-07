@@ -25,6 +25,9 @@ public class PlayerCamera : MonoBehaviour {
     [Tooltip("Camera sensitivity")]
     [SerializeField] private float _sensitivity = 3f;
 
+    // to remove;
+    public bool TakingInput = true;
+
     private void Start() {
         transform.parent = null;
         Cursor.lockState = CursorLockMode.Locked;
@@ -34,6 +37,10 @@ public class PlayerCamera : MonoBehaviour {
     private void Update() {
         Vector3 mouseInput = new Vector3(Input.GetAxis("Mouse X"),
             Input.GetAxis("Mouse Y"), 0f) * _sensitivity;
+
+        if (!TakingInput) {
+            mouseInput = Vector3.zero;
+        }
 
 
         // Calculate camera center's position which is orbit radius away from follow.

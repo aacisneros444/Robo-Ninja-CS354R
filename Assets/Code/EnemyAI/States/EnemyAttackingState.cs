@@ -30,8 +30,14 @@ public class EnemyAttackingState : IState {
     }
 
     private void GenerateAttackPoint() {
+        float ApproxProjectileTravelTime = 0.5f;
+        float projectileTravelTimeFactor = _controllerData.playerRb.velocity.magnitude / 22f;
+        if (projectileTravelTimeFactor > 1f) {
+            projectileTravelTimeFactor = 1f;
+        }
+        float projectileTravelTime = ApproxProjectileTravelTime * projectileTravelTimeFactor;
         Vector3 predictedPos = _controllerData.playerTransform.position +
-            _controllerData.playerRb.velocity * _controllerData.attackReadyingTime;
+            _controllerData.playerRb.velocity * (_controllerData.attackReadyingTime + projectileTravelTime);
         // refactor, 15f should be player's max speed
         float randomnessMultiplier = _controllerData.playerRb.velocity.magnitude / 15f;
         Vector3 randomOffset = Random.insideUnitSphere * Random.Range(0f, 15f * randomnessMultiplier);
@@ -39,6 +45,14 @@ public class EnemyAttackingState : IState {
 
         if (!_controllerData.worldOctree.Root.NodeBounds.Contains(_attackPosition)) {
             _attackPosition = _controllerData.worldOctree.Root.NodeBounds.ClosestPoint(_attackPosition);
+        }
+
+        Vector3 toAttackPos = _attackPosition - _controllerData.rootTransform.position;
+        Vector3 dir = toAttackPos.normalized;
+        if (Physics.Raycast(_controllerData.rootTransform.position, dir, out RaycastHit hit,
+                            toAttackPos.magnitude, ~LayerMask.GetMask("Enemy"))) {
+            // Something in the way to attack position. Change attack pos to hit point.
+            _attackPosition = hit.point;
         }
     }
 

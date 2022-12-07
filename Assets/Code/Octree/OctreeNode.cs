@@ -461,6 +461,11 @@ public class OctreeNode {
         Gizmos.DrawCube(_nodeBounds.center, _nodeBounds.size);
     }
 
+    public void DrawOnlySelf(Color c) {
+        Gizmos.color = c;
+        Gizmos.DrawCube(_nodeBounds.center, _nodeBounds.size);
+    }
+
     public void DrawFaceNeighbors() {
         Gizmos.color = Color.red;
         if (_faceNeighbors != null) {

@@ -26,6 +26,6 @@ MonoBehaviour:
   _tetherSpringStrength: 250
   _tetherSpringDamper: 200
   _maxReelSpeed: 28
-  _maxReelAcceleration: 55
+  _maxReelAcceleration: 75
   _horitontalSwingStrength: 17
   _aimAssistLatchOnRadius: 2.5

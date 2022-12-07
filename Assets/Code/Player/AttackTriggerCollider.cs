@@ -3,6 +3,7 @@ using UnityEngine;
 public class AttackTriggerCollider : MonoBehaviour {
     // refactor out
     [SerializeField] private ParticleSystem _enemyExplosionParticles;
+    public static event System.Action KilledEnemy;
 
     private void OnTriggerEnter(Collider other) {
         if (other.gameObject.layer == LayerMask.NameToLayer("Enemy")) {
@@ -14,6 +15,7 @@ public class AttackTriggerCollider : MonoBehaviour {
                 child.GetComponent<ParticleSystem>().Play();
             }
             GameObject.Destroy(other.gameObject);
+            KilledEnemy?.Invoke();
         }
     }
 }

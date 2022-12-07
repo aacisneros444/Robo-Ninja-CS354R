@@ -1,9 +1,11 @@
 using UnityEngine;
+using System;
 
 public class PlayerInAirState : IState {
     private StateMachine _parentFsm;
     private StateMachine _burstingSubstatesFsm;
     private PlayerController _controller;
+    public static event Action EnteredState;
 
     public PlayerInAirState(StateMachine parentFsm, PlayerController controller) {
         _parentFsm = parentFsm;
@@ -14,6 +16,7 @@ public class PlayerInAirState : IState {
 
     public void Enter() {
         _controller.PlayerAnimator.Play("Falling");
+        EnteredState?.Invoke();
     }
 
     public void Update() {

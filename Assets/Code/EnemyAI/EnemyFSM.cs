@@ -32,6 +32,13 @@ public class EnemyFSM : MonoBehaviour {
     }
 
     private void Start() {
+        GameObject player = GameObject.FindGameObjectWithTag("Player Controller");
+        _playerRb = player.GetComponent<Rigidbody>();
+        _playerTransform = player.transform.Find("Pivot").transform;
+        GameObject octree = GameObject.FindGameObjectWithTag("Octree");
+        _worldOctree = octree.GetComponent<Octree>();
+        _pathfinder = octree.GetComponent<OctreePathfinder>();
+
         EnemyControllerData controllerData = new EnemyControllerData {
             worldOctree = _worldOctree,
             pathFinder = _pathfinder,

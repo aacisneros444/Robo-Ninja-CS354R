@@ -1,4 +1,5 @@
 using UnityEngine;
+using System;
 
 public struct TryTetherResult {
     public bool tethered;
@@ -6,6 +7,9 @@ public struct TryTetherResult {
 }
 
 public static class TetherUtils {
+    // for tutorial, refactor..?
+    public static event Action PlayerSwungAround;
+
     // Try to tether using a raycast from camera center.
     public static TryTetherResult TryTether(PlayerController controller) {
         TryTetherResult tetherData = new TryTetherResult {
@@ -17,6 +21,7 @@ public static class TetherUtils {
         bool gotHit = false;
         RaycastHit rayHit = new RaycastHit();
 
+        int castLayers = ~(LayerMask.GetMask("Player") | LayerMask.GetMask("Level Bounds"));
         // Check if any enemies are in the camera direction with a spherecast.
         Transform enemyTransform = GetEnemyInTetherDirection(controller);
         if (enemyTransform) {
@@ -25,14 +30,14 @@ public static class TetherUtils {
             Vector3 dir = (enemyTransform.position - controller.Cam.transform.position).normalized;
             gotHit = Physics.Raycast(controller.Cam.transform.position, dir,
                                      out rayHit, controller.ControllerData.MaxTetherFireDistance,
-                                     ~LayerMask.GetMask("Player"));
+                                     castLayers);
         }
         if (!gotHit) {
             // Couldn't latch to an enemy in camera facing direction. 
             // Try a simple raycast to tether to a surface.
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             gotHit = Physics.Raycast(ray, out rayHit, controller.ControllerData.MaxTetherFireDistance,
-                                     ~LayerMask.GetMask("Player"));
+                                     castLayers);
         }
 
         if (gotHit) {
@@ -93,6 +98,9 @@ public static class TetherUtils {
         if (adInput != 0) {
             float distanceToTether = Vector3.Distance(tetherPoint, controller.transform.position);
             float rightLeftStrength = Mathf.Clamp01(1f / distanceToTether);
+            if (rightLeftStrength > 0.15f) {
+                PlayerSwungAround?.Invoke();
+            }
             Vector3 swing = Vector3.Cross(Vector3.up, reelDir) * rightLeftStrength *
                                           controller.ControllerData.HoritontalSwingStrength;
             if (adInput < 0) {

@@ -96,8 +96,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _explosionEffect: {fileID: 7045179590792609454}
   _explosionSound: {fileID: 365985359775421200}
-  _speed: 100
+  _speed: 150
   _aliveTime: 10
+  _damage: 1
   ExplosionRadius: 0
   ExplodePosition: {x: 0, y: 0, z: 0}
 --- !u!82 &365985359775421200
@@ -112,7 +113,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: 2a83a441de2df3d4fa9227e02efa587c, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 0.025
+  m_Volume: 0.15
   m_Pitch: 1
   Loop: 0
   Mute: 0
