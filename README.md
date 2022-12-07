@@ -16,6 +16,10 @@ This repo contains the contents of said project.
 
 - [Report](https://docs.google.com/document/d/1nHYBb5cJcZX_f5hZiSG6fKHq9GPrcdM8xyLA5CkjKFU/edit?usp=sharing)
 
+- [Video Presentation](https://youtu.be/0k1A6oWrVls)
+
+- [Game Trailer](https://youtu.be/Beuzh6sr8bY)
+
 ## Build instructions
 
 - Clone the repository.
