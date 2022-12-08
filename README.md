@@ -14,9 +14,9 @@ This repo contains the contents of said project.
 
 - [Alpha/Milestone Video](https://youtu.be/-Xd1_spMVP0)
 
-- [Report](https://docs.google.com/document/d/1nHYBb5cJcZX_f5hZiSG6fKHq9GPrcdM8xyLA5CkjKFU/edit?usp=sharing)
+- [Alpha Report](https://docs.google.com/document/d/1nHYBb5cJcZX_f5hZiSG6fKHq9GPrcdM8xyLA5CkjKFU/edit?usp=sharing)
 
-- [Video Presentation](https://youtu.be/0k1A6oWrVls)
+- [Report/Video Presentation](https://youtu.be/0k1A6oWrVls) (this covers what I would have said in a written report)
 
 - [Game Trailer](https://youtu.be/Beuzh6sr8bY)
 
