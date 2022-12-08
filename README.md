@@ -31,6 +31,17 @@ This repo contains the contents of said project.
 - Once the editor is open, go to File->Build And Run. The editor will ask you where you want your build to be located. Any place on your machine works.
 - Once the build completes, the game will open automatically. If not, you can run the .exe that will be created at the build location you selected.
 
+## Instruction Manual
+
+There's an in-game tutorial which I highly, highly recommend doing, but here's a list of controls anyways.
+
+- WASD to move when grounded, E to jump
+- Right click to tether
+- Space to reel in
+- Left click to attack
+- Double press and hold WASD to burst forward, left, backwards, and right respectively (WHEN AIRBORNE)
+- Hold Q or E to burst down or up respectively (WHEN AIRBORNE)
+
 ## Credits
 
 - In-game music is Aquatic Base Level 2 by Mariko Nanba from Sonic the Hedgehog (2006)
