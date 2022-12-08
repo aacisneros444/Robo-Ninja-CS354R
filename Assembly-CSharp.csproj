@@ -88,6 +88,7 @@
      <Compile Include="Assets\Code\StateMachine\IState.cs" />
      <Compile Include="Assets\Code\StateMachine\StateMachine.cs" />
      <Compile Include="Assets\Code\Tutorial\TutorialManager.cs" />
+     <Compile Include="Assets\Code\UI\ChangeDifficultyButton.cs" />
      <Compile Include="Assets\Code\UI\ChangeGameStateButton.cs" />
      <Compile Include="Assets\Code\UI\EnemyKillCountDisplay.cs" />
      <Compile Include="Assets\Code\UI\OnPlayerLoseUI.cs" />

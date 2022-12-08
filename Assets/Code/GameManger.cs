@@ -7,9 +7,18 @@ public enum GameState {
     PlayingTutorial
 }
 
+public enum GameDifficulty {
+    Easy,
+    Medium,
+    Harder,
+    Hard,
+    VeryHard
+}
+
 public class GameManger : MonoBehaviour {
 
     public static GameManger Instance { get; private set; }
+    public GameDifficulty CurrentDifficulty;
 
     [SerializeField] private string _mainMenuScene;
     [SerializeField] private string _gameScene;
@@ -24,6 +33,7 @@ public class GameManger : MonoBehaviour {
         }
         Instance = this;
         _currentState = GameState.MainMenu;
+        CurrentDifficulty = GameDifficulty.Easy;
         DontDestroyOnLoad(this);
     }
 
