@@ -11,8 +11,8 @@ public class PlayerController : MonoBehaviour {
     private Rigidbody _rb;
 
     [Header("Tether Components")]
-    [SerializeField] private Transform _rightTetherOrigin;
-    [SerializeField] private Transform _leftTetherOrigin;
+    [SerializeField] private TetherRenderer _tetherRenderer;
+    [SerializeField] private ThrusterRenderer _thrusterRenderer;
 
     [Header("Attacking Components")]
     [SerializeField] private GameObject _attackTriggerCollider;
@@ -22,8 +22,7 @@ public class PlayerController : MonoBehaviour {
     // Fsm which handles tether states.
     private StateMachine _tetherFsm;
 
-    // Read-only properties for above fields.
-
+    // --Read-only properties for above fields.
     // State Machines
     public StateMachine MainFsm => _mainFsm;
     public StateMachine TetherFsm => _tetherFsm;
@@ -38,8 +37,8 @@ public class PlayerController : MonoBehaviour {
     public Rigidbody Rb => _rb;
 
     // Tether Components
-    public Transform RightTetherOrigin => _rightTetherOrigin;
-    public Transform LeftTetherOrigin => _leftTetherOrigin;
+    public TetherRenderer TetherRenderer => _tetherRenderer;
+    public ThrusterRenderer ThrusterRenderer => _thrusterRenderer;
 
     // Attacking Components
     public GameObject AttackTriggerCollider => _attackTriggerCollider;

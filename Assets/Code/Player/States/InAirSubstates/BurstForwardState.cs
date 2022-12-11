@@ -5,8 +5,7 @@ public class BurstForwardState : IState {
 
     private StateMachine _parentFsm;
     private PlayerController _controller;
-    public static event Action OnBurst;
-    public static event Action OnExitBurst;
+    public static event Action EnteredState;
 
     public BurstForwardState(StateMachine parentFsm, PlayerController controller) {
         _parentFsm = parentFsm;
@@ -14,7 +13,8 @@ public class BurstForwardState : IState {
     }
 
     public void Enter() {
-        OnBurst?.Invoke();
+        EnteredState?.Invoke();
+        _controller.ThrusterRenderer.AddThrust();
         _controller.PlayerAnimator.Play("BurstForward");
         BurstUtils.DampVelocityForBurst(_controller, _controller.Cam.transform.forward);
     }
@@ -36,6 +36,7 @@ public class BurstForwardState : IState {
     public void Exit() {
         Vector3 originalEuler = _controller.PlayerModel.eulerAngles;
         _controller.PlayerModel.rotation = Quaternion.Euler(0f, originalEuler.y, originalEuler.z);
-        OnExitBurst?.Invoke();
+
+        _controller.ThrusterRenderer.RemoveThrust();
     }
 }

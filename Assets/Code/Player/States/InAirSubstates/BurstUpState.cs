@@ -5,8 +5,7 @@ public class BurstUpState : IState {
 
     private StateMachine _parentFsm;
     private PlayerController _controller;
-    public static event Action OnBurst;
-    public static event Action OnExitBurst;
+    public static event Action EnteredState;
 
     public BurstUpState(StateMachine parentFsm, PlayerController controller) {
         _parentFsm = parentFsm;
@@ -14,7 +13,8 @@ public class BurstUpState : IState {
     }
 
     public void Enter() {
-        OnBurst?.Invoke();
+        EnteredState?.Invoke();
+        _controller.ThrusterRenderer.AddThrust();
         _controller.PlayerAnimator.Play("BurstUp");
         BurstUtils.DampVelocityForBurst(_controller, Vector3.up);
     }
@@ -31,6 +31,6 @@ public class BurstUpState : IState {
     }
 
     public void Exit() {
-        OnExitBurst?.Invoke();
+        _controller.ThrusterRenderer.RemoveThrust();
     }
 }

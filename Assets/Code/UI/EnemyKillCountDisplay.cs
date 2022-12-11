@@ -10,11 +10,11 @@ public class EnemyKillCountDisplay : MonoBehaviour {
     public static event Action DestroyedLevelEnemies;
 
     private void Awake() {
-        AttackTriggerCollider.KilledEnemy += OnEnemyKilled;
+        PlayerAttackTriggerCollider.KilledEnemy += OnEnemyKilled;
     }
 
     private void OnDestroy() {
-        AttackTriggerCollider.KilledEnemy -= OnEnemyKilled;
+        PlayerAttackTriggerCollider.KilledEnemy -= OnEnemyKilled;
     }
 
     private void OnEnemyKilled() {

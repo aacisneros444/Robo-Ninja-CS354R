@@ -7,8 +7,7 @@ public class IsReelingState : IState {
     private PlayerController _controller;
     private Transform _tetherEnd;
     private float _tetherLength;
-    public static event Action OnReeling;
-    public static event Action OnStopReeling;
+    public static event Action EnteredState;
 
     public IsReelingState(StateMachine parentFsm, PlayerController controller, Transform tetherEnd,
                           float tetherLength) {
@@ -19,7 +18,8 @@ public class IsReelingState : IState {
     }
 
     public void Enter() {
-        OnReeling?.Invoke();
+        EnteredState?.Invoke();
+        _controller.ThrusterRenderer.AddThrust();
         _controller.PlayerAnimator.Play("Reeling");
     }
 
@@ -44,7 +44,7 @@ public class IsReelingState : IState {
     }
 
     public void Exit() {
-        OnStopReeling?.Invoke();
+        _controller.ThrusterRenderer.RemoveThrust();
         if (_controller.MainFsm.GetCurrentState().GetType() != typeof(PlayerAttackingState)) {
             _controller.PlayerAnimator.Play("Falling");
         }

@@ -10,6 +10,7 @@ public class Octree : MonoBehaviour {
     [SerializeField] private int _minNodeSize = 8;
     [SerializeField] private int _maxNodeSize = 32;
     [SerializeField] private bool _drawEntireTree = false;
+    [SerializeField] private bool _drawOnlyNonEmptyLeafNodes = false;
 
     private OctreeNode _root;
     public OctreeNode Root { get { return _root; } }
@@ -31,13 +32,17 @@ public class Octree : MonoBehaviour {
         _root = new OctreeNode(worldBounds, null, 0, _minNodeSize, _maxNodeSize);
 
         GameObject[] collisionObjects = GameObject.FindGameObjectsWithTag("Octree Collider");
+        float timeBefore = Time.realtimeSinceStartup;
         _root.DivideForObjects(collisionObjects);
+        Debug.Log("Generation time: " + ((Time.realtimeSinceStartup - timeBefore) * 1000) + " ms");
     }
 
     private void OnDrawGizmos() {
         if (Application.isPlaying) {
             if (_drawEntireTree) {
-                _root.Draw();
+                _root.Draw(false);
+            } else if (_drawOnlyNonEmptyLeafNodes) {
+                _root.Draw(true);
             }
             if (_posDrawTarget != null) {
                 _posDrawTarget.DrawOnlySelf();

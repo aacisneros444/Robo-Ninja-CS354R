@@ -88,7 +88,7 @@ GameObject:
   - component: {fileID: 6809685420035285775}
   - component: {fileID: 6809685420035285770}
   m_Layer: 5
-  m_Name: Highlight Enemy Crosshair Canvas
+  m_Name: Tether Assist Crosshair Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -186,5 +186,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6310f5aa3465fae428ed90302c95baa1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _castRadius: 2.5
+  _controllerData: {fileID: 0}
   _crosshair: {fileID: 6809685419916051881}

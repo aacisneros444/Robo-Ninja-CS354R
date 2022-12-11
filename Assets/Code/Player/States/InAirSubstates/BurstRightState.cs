@@ -5,8 +5,7 @@ public class BurstRightState : IState {
 
     private StateMachine _parentFsm;
     private PlayerController _controller;
-    public static event Action OnBurst;
-    public static event Action OnExitBurst;
+    public static event Action EnteredState;
 
     public BurstRightState(StateMachine parentFsm, PlayerController controller) {
         _parentFsm = parentFsm;
@@ -14,7 +13,8 @@ public class BurstRightState : IState {
     }
 
     public void Enter() {
-        OnBurst?.Invoke();
+        EnteredState?.Invoke();
+        _controller.ThrusterRenderer.AddThrust();
         _controller.PlayerAnimator.Play("BurstSideRight");
         BurstUtils.DampVelocityForBurst(_controller, _controller.Cam.transform.right);
     }
@@ -33,6 +33,6 @@ public class BurstRightState : IState {
     }
 
     public void Exit() {
-        OnExitBurst?.Invoke();
+        _controller.ThrusterRenderer.RemoveThrust();
     }
 }

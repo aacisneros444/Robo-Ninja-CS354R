@@ -22,10 +22,18 @@ MonoBehaviour:
   _burstStartDampFactor: 0.5
   _maxBurstSpeed: 22
   _maxBurstAcceleration: 75
+  _thrustersSound: {fileID: 8300000, guid: e3114635f63990444b4f78134818f541, type: 3}
   _maxTetherFireDistance: 150
   _tetherSpringStrength: 250
   _tetherSpringDamper: 200
   _maxReelSpeed: 28
   _maxReelAcceleration: 75
   _horitontalSwingStrength: 17
-  _aimAssistLatchOnRadius: 2.5
+  _tetherSound: {fileID: 8300000, guid: 7c24500ec3081c548aa16583f003e0de, type: 3}
+  _tetherAssistLatchOnRadius: 2.5
+  _enemyLayerMask:
+    serializedVersion: 2
+    m_Bits: 512
+  _attackParticlesPrefab: {fileID: 214096509298611462, guid: 89f7f6193c246154a99ed92dcc2cd1e6,
+    type: 3}
+  _attackHitSound: {fileID: 8300000, guid: a968462ddb8da1c4490e1fad9aa7c0bb, type: 3}

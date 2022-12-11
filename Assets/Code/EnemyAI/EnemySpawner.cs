@@ -12,11 +12,11 @@ public class EnemySpawner : MonoBehaviour {
     void Start() {
         DecideSpawnRate();
         StartCoroutine(SpawnEnemy());
-        AttackTriggerCollider.KilledEnemy += OnEnemyKilled;
+        PlayerAttackTriggerCollider.KilledEnemy += OnEnemyKilled;
     }
 
     void OnDestroy() {
-        AttackTriggerCollider.KilledEnemy -= OnEnemyKilled;
+        PlayerAttackTriggerCollider.KilledEnemy -= OnEnemyKilled;
     }
 
     private void OnEnemyKilled() {

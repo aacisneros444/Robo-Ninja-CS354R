@@ -4,7 +4,7 @@ using TMPro;
 public class OnPlayerWinUI : MonoBehaviour {
     [SerializeField] private TMP_Text _gameWinText;
     [SerializeField] private GameObject _mainMenuButton;
-    [SerializeField] private PlayerCamera _playerCamera;
+    [SerializeField] private PlayerCameraController _playerCamera;
     [SerializeField] private EnemySpawner _enemySpawner;
 
     private void Awake() {

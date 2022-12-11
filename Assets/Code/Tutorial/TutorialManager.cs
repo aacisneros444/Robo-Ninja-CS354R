@@ -55,17 +55,17 @@ public class TutorialManager : MonoBehaviour {
     private void OnDestroy() {
         PlayerMovingState.EnteredState -= OnPlayerMovedGrounded;
         PlayerInAirState.EnteredState -= OnPlayerJumped;
-        IsTetheredState.EnteredTetherState -= OnPlayerTethered;
-        IsReelingState.OnReeling -= OnPlayerReeled;
-        TetherUtils.PlayerSwungAround -= OnPlayerSwungAroundObject;
-        BurstForwardState.OnBurst -= OnPlayerForwardBurst;
-        BurstBackwardState.OnBurst -= OnPlayerBackwardBurst;
-        BurstLeftState.OnBurst -= OnPlayerLeftBurst;
-        BurstRightState.OnBurst -= OnPlayerRightBurst;
-        BurstUpState.OnBurst -= OnPlayerUpBurst;
-        BurstDownState.OnBurst -= OnPlayerDownBurst;
-        AttackTriggerCollider.KilledEnemy -= OnPlayerKilledDummy;
-        AttackTriggerCollider.KilledEnemy -= OnPlayerKilledEnemy;
+        IsTetheredState.EnteredState -= OnPlayerTethered;
+        IsReelingState.EnteredState -= OnPlayerReeled;
+        TetherUtils.PlayerSwungHorizontal -= OnPlayerSwungAroundObject;
+        BurstForwardState.EnteredState -= OnPlayerForwardBurst;
+        BurstBackwardState.EnteredState -= OnPlayerBackwardBurst;
+        BurstLeftState.EnteredState -= OnPlayerLeftBurst;
+        BurstRightState.EnteredState -= OnPlayerRightBurst;
+        BurstUpState.EnteredState -= OnPlayerUpBurst;
+        BurstDownState.EnteredState -= OnPlayerDownBurst;
+        PlayerAttackTriggerCollider.KilledEnemy -= OnPlayerKilledDummy;
+        PlayerAttackTriggerCollider.KilledEnemy -= OnPlayerKilledEnemy;
     }
 
     private void Update() {
@@ -202,11 +202,11 @@ public class TutorialManager : MonoBehaviour {
     private void DisplayTetherTutorial() {
         _displayedTetheredTutorial = true;
         _tetherInstructionsText.SetActive(true);
-        IsTetheredState.EnteredTetherState += OnPlayerTethered;
+        IsTetheredState.EnteredState += OnPlayerTethered;
     }
 
-    private void OnPlayerTethered(Transform t) {
-        IsTetheredState.EnteredTetherState -= OnPlayerTethered;
+    private void OnPlayerTethered() {
+        IsTetheredState.EnteredState -= OnPlayerTethered;
         _tetherInstructionsText.SetActive(false);
         _playerTethered = true;
         StartCoroutine(DisplayPositiveFeedback());
@@ -215,11 +215,11 @@ public class TutorialManager : MonoBehaviour {
     private void DisplayReelTutorial() {
         _displayedReeledTutorial = true;
         _reelInstructionsText.SetActive(true);
-        IsReelingState.OnReeling += OnPlayerReeled;
+        IsReelingState.EnteredState += OnPlayerReeled;
     }
 
     private void OnPlayerReeled() {
-        IsReelingState.OnReeling -= OnPlayerReeled;
+        IsReelingState.EnteredState -= OnPlayerReeled;
         _reelInstructionsText.SetActive(false);
         _playerReeled = true;
         StartCoroutine(DisplayPositiveFeedback());
@@ -228,11 +228,11 @@ public class TutorialManager : MonoBehaviour {
     private void DisplayLeftRightSwingTutorial() {
         _displayedADSwingTutorial = true;
         _adSwingInstructionsText.SetActive(true);
-        TetherUtils.PlayerSwungAround += OnPlayerSwungAroundObject;
+        TetherUtils.PlayerSwungHorizontal += OnPlayerSwungAroundObject;
     }
 
     private void OnPlayerSwungAroundObject() {
-        TetherUtils.PlayerSwungAround -= OnPlayerSwungAroundObject;
+        TetherUtils.PlayerSwungHorizontal -= OnPlayerSwungAroundObject;
         _adSwingInstructionsText.SetActive(false);
         _playerADSwung = true;
         StartCoroutine(DisplaySwingTip());
@@ -252,11 +252,11 @@ public class TutorialManager : MonoBehaviour {
     private void DisplayForwardBurstTutorial() {
         _displayedForwardBurstTutorial = true;
         _forwardBurstInstructionsText.SetActive(true);
-        BurstForwardState.OnBurst += OnPlayerForwardBurst;
+        BurstForwardState.EnteredState += OnPlayerForwardBurst;
     }
 
     private void OnPlayerForwardBurst() {
-        BurstForwardState.OnBurst -= OnPlayerForwardBurst;
+        BurstForwardState.EnteredState -= OnPlayerForwardBurst;
         _forwardBurstInstructionsText.SetActive(false);
         _playerForwardBurst = true;
         StartCoroutine(DisplayPositiveFeedback());
@@ -265,11 +265,11 @@ public class TutorialManager : MonoBehaviour {
     private void DisplayBackwardsBurstTutorial() {
         _displayedBackwardBurstTutorial = true;
         _backwardBurstInstructionsText.SetActive(true);
-        BurstBackwardState.OnBurst += OnPlayerBackwardBurst;
+        BurstBackwardState.EnteredState += OnPlayerBackwardBurst;
     }
 
     private void OnPlayerBackwardBurst() {
-        BurstBackwardState.OnBurst -= OnPlayerBackwardBurst;
+        BurstBackwardState.EnteredState -= OnPlayerBackwardBurst;
         _backwardBurstInstructionsText.SetActive(false);
         _playerBackwardBurst = true;
         StartCoroutine(DisplayPositiveFeedback());
@@ -278,11 +278,11 @@ public class TutorialManager : MonoBehaviour {
     private void DisplayLeftBurstTutorial() {
         _displayedLeftBurstTutorial = true;
         _leftBurstInstructionsText.SetActive(true);
-        BurstLeftState.OnBurst += OnPlayerLeftBurst;
+        BurstLeftState.EnteredState += OnPlayerLeftBurst;
     }
 
     private void OnPlayerLeftBurst() {
-        BurstLeftState.OnBurst -= OnPlayerLeftBurst;
+        BurstLeftState.EnteredState -= OnPlayerLeftBurst;
         _leftBurstInstructionsText.SetActive(false);
         _playerLeftBurst = true;
         StartCoroutine(DisplayPositiveFeedback());
@@ -291,11 +291,11 @@ public class TutorialManager : MonoBehaviour {
     private void DisplayRightBurstTutorial() {
         _displayedRightBurstTutorial = true;
         _rightBurstInstructionsText.SetActive(true);
-        BurstRightState.OnBurst += OnPlayerRightBurst;
+        BurstRightState.EnteredState += OnPlayerRightBurst;
     }
 
     private void OnPlayerRightBurst() {
-        BurstRightState.OnBurst -= OnPlayerRightBurst;
+        BurstRightState.EnteredState -= OnPlayerRightBurst;
         _rightBurstInstructionsText.SetActive(false);
         _playerRightBurst = true;
         StartCoroutine(DisplayPositiveFeedback());
@@ -304,11 +304,11 @@ public class TutorialManager : MonoBehaviour {
     private void DisplayUpBurstTutorial() {
         _displayedUpBurstTutorial = true;
         _upBurstInstructionsText.SetActive(true);
-        BurstUpState.OnBurst += OnPlayerUpBurst;
+        BurstUpState.EnteredState += OnPlayerUpBurst;
     }
 
     private void OnPlayerUpBurst() {
-        BurstUpState.OnBurst -= OnPlayerUpBurst;
+        BurstUpState.EnteredState -= OnPlayerUpBurst;
         _upBurstInstructionsText.SetActive(false);
         _playerUpBurst = true;
         StartCoroutine(DisplayPositiveFeedback());
@@ -317,11 +317,11 @@ public class TutorialManager : MonoBehaviour {
     private void DisplayDownBurstTutorial() {
         _displayedDownBurstTutorial = true;
         _downBurstInstructionsText.SetActive(true);
-        BurstDownState.OnBurst += OnPlayerDownBurst;
+        BurstDownState.EnteredState += OnPlayerDownBurst;
     }
 
     private void OnPlayerDownBurst() {
-        BurstDownState.OnBurst -= OnPlayerDownBurst;
+        BurstDownState.EnteredState -= OnPlayerDownBurst;
         _downBurstInstructionsText.SetActive(false);
         _playerDownBurst = true;
         StartCoroutine(DisplayLearnToFightText());
@@ -341,7 +341,7 @@ public class TutorialManager : MonoBehaviour {
         _killDummiesInstruction.SetActive(true);
         _enemiesKilledText.gameObject.SetActive(true);
         _dummiesParent.SetActive(true);
-        AttackTriggerCollider.KilledEnemy += OnPlayerKilledDummy;
+        PlayerAttackTriggerCollider.KilledEnemy += OnPlayerKilledDummy;
     }
 
     private void OnPlayerKilledDummy() {
@@ -351,7 +351,7 @@ public class TutorialManager : MonoBehaviour {
         if (_numDummiesKilled < NumDummiesToKill) {
             return;
         }
-        AttackTriggerCollider.KilledEnemy -= OnPlayerKilledDummy;
+        PlayerAttackTriggerCollider.KilledEnemy -= OnPlayerKilledDummy;
         _playerKilledDummies = true;
         _killDummiesInstruction.SetActive(false);
         _enemiesKilledText.gameObject.SetActive(false);
@@ -376,7 +376,7 @@ public class TutorialManager : MonoBehaviour {
         _enemiesKilledText.text = "0/5 destroyed";
         _enemiesKilledText.gameObject.SetActive(true);
         StartCoroutine(SpawnEnemies());
-        AttackTriggerCollider.KilledEnemy += OnPlayerKilledEnemy;
+        PlayerAttackTriggerCollider.KilledEnemy += OnPlayerKilledEnemy;
     }
 
     private void OnPlayerKilledEnemy() {
@@ -386,7 +386,7 @@ public class TutorialManager : MonoBehaviour {
         if (_numEnemiesKilled < NumEnemiesToKill) {
             return;
         }
-        AttackTriggerCollider.KilledEnemy -= OnPlayerKilledEnemy;
+        PlayerAttackTriggerCollider.KilledEnemy -= OnPlayerKilledEnemy;
         _playerKilledEnemies = true;
         _killEnemiesInstructionText.SetActive(false);
         _enemiesKilledText.gameObject.SetActive(false);

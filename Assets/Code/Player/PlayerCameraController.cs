@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class PlayerCamera : MonoBehaviour {
+public class PlayerCameraController : MonoBehaviour {
 
     [SerializeField] private Camera _cam;
 
@@ -14,18 +14,20 @@ public class PlayerCamera : MonoBehaviour {
     [SerializeField] private Transform _orbiter;
 
     [Tooltip("How far away should the camera be from the follow target.")]
-    [SerializeField] private float _zOffset;
+    [SerializeField] private float _zOffset = -3.5f;
 
     [Tooltip("A y offset applied to the camera following the follow target.")]
-    [SerializeField] private float _yOffset;
+    [SerializeField] private float _yOffset = 1.15f;
 
     [Tooltip("How far should the camera orbit around the follow target.")]
-    [SerializeField] private float _orbitRadius = 1f;
+    [SerializeField] private float _orbitRadius = 0.8f;
 
     [Tooltip("Camera sensitivity")]
     [SerializeField] private float _sensitivity = 3f;
 
-    // to remove;
+    /// <summary>
+    /// Defines whether or not the camera controller is currently responding to input.
+    /// </summary>
     public bool TakingInput = true;
 
     private void Start() {
@@ -42,30 +44,27 @@ public class PlayerCamera : MonoBehaviour {
             mouseInput = Vector3.zero;
         }
 
-
         // Calculate camera center's position which is orbit radius away from follow.
         _orbiter.position = _follow.position + new Vector3(0f, _yOffset, 0f);
-        _orbiter.rotation = Quaternion.Euler(_orbiter.eulerAngles.x, _orbiter.eulerAngles.y + mouseInput.x, 0f);
+        _orbiter.rotation = Quaternion.Euler(_orbiter.eulerAngles.x,
+                                             _orbiter.eulerAngles.y + mouseInput.x,
+                                             0f);
         // Set camera center position
         _cameraCenter.position = _orbiter.position + _orbiter.right * _orbitRadius;
 
         // Set camera rotation.
-        Vector3 currEulerAngles = _cameraCenter.transform.rotation.eulerAngles;
-        Quaternion newRotation = Quaternion.Euler(currEulerAngles.x - mouseInput.y,
-            currEulerAngles.y + mouseInput.x, currEulerAngles.z);
-        _cameraCenter.rotation = newRotation;
-
-        // Clamp x rotation.
-        float clampedX = _cameraCenter.eulerAngles.x;
-        if (clampedX > 90f && clampedX < 180f) {
-            clampedX = 90f;
-        } else if (clampedX < 270f && clampedX > 180f) {
-            clampedX = 270f;
+        Vector3 currEulerAngles = _cameraCenter.transform.eulerAngles;
+        float newRotX = currEulerAngles.x - mouseInput.y;
+        float newRotY = currEulerAngles.y + mouseInput.x;
+        if (newRotX > 90f && newRotX < 180f) {
+            // clamp to quadrant 1
+            newRotX = 90f;
+        } else if (newRotX > 180f && newRotX < 270f) {
+            // clamp to quadrant 4
+            newRotX = 270f;
         }
-        _cameraCenter.rotation = Quaternion.Euler(
-            new Vector3(clampedX, newRotation.eulerAngles.y,
-                         newRotation.eulerAngles.z));
-
+        Quaternion newRotation = Quaternion.Euler(newRotX, newRotY, currEulerAngles.z);
+        _cameraCenter.rotation = newRotation;
 
         // // Set camera z offset.
         _cam.transform.localPosition = new Vector3(0f, 0f, _zOffset);
@@ -73,7 +72,8 @@ public class PlayerCamera : MonoBehaviour {
         // Check for collisions
         Vector3 centerToCamDir = (_cam.transform.position - _cameraCenter.position).normalized;
         if (Physics.Raycast(_cameraCenter.position, centerToCamDir,
-             out RaycastHit rayHit, Mathf.Abs(_zOffset), ~LayerMask.GetMask("Player"))) {
+                            out RaycastHit rayHit, Mathf.Abs(_zOffset),
+                            ~LayerMask.GetMask("Player"))) {
             _cam.transform.position = rayHit.point;
         }
     }

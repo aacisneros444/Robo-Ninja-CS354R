@@ -5,8 +5,7 @@ public class BurstBackwardState : IState {
 
     private StateMachine _parentFsm;
     private PlayerController _controller;
-    public static event Action OnBurst;
-    public static event Action OnExitBurst;
+    public static event Action EnteredState;
 
     public BurstBackwardState(StateMachine parentFsm, PlayerController controller) {
         _parentFsm = parentFsm;
@@ -14,7 +13,8 @@ public class BurstBackwardState : IState {
     }
 
     public void Enter() {
-        OnBurst?.Invoke();
+        EnteredState?.Invoke();
+        _controller.ThrusterRenderer.AddThrust();
         _controller.PlayerAnimator.Play("BurstForward");
         BurstUtils.DampVelocityForBurst(_controller, -1f * _controller.Cam.transform.forward);
     }
@@ -34,7 +34,7 @@ public class BurstBackwardState : IState {
 
     public void Exit() {
         ResetPlayerModelRotation();
-        OnExitBurst?.Invoke();
+        _controller.ThrusterRenderer.RemoveThrust();
     }
 
     private void RotatePlayerModelBackwards() {

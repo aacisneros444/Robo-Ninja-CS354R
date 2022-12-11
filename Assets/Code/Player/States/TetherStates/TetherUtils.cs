@@ -7,8 +7,8 @@ public struct TryTetherResult {
 }
 
 public static class TetherUtils {
-    // for tutorial, refactor..?
-    public static event Action PlayerSwungAround;
+    // Fired when a player swings horizontally enough (AD swing) while reeling.
+    public static event Action PlayerSwungHorizontal;
 
     // Try to tether using a raycast from camera center.
     public static TryTetherResult TryTether(PlayerController controller) {
@@ -35,7 +35,7 @@ public static class TetherUtils {
         if (!gotHit) {
             // Couldn't latch to an enemy in camera facing direction. 
             // Try a simple raycast to tether to a surface.
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            Ray ray = controller.Cam.ScreenPointToRay(Input.mousePosition);
             gotHit = Physics.Raycast(ray, out rayHit, controller.ControllerData.MaxTetherFireDistance,
                                      castLayers);
         }
@@ -60,10 +60,12 @@ public static class TetherUtils {
     /// <param name="controller">The player controller</param>
     /// <returns>A transform from the hit enemy if a hit occured, null otherwise.</returns>
     public static Transform GetEnemyInTetherDirection(PlayerController controller) {
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        bool hitSomething = Physics.SphereCast(ray, controller.ControllerData.AimAssistLatchOnRadius,
-                                               out RaycastHit castHit, controller.ControllerData.MaxTetherFireDistance,
-                                               LayerMask.GetMask("Enemy"));
+        Ray ray = controller.Cam.ScreenPointToRay(Input.mousePosition);
+        bool hitSomething = Physics.SphereCast(ray,
+                                               controller.ControllerData.TetherAssistLatchOnRadius,
+                                               out RaycastHit castHit,
+                                               controller.ControllerData.MaxTetherFireDistance,
+                                               controller.ControllerData.EnemyLayerMask.value);
         if (hitSomething) {
             return castHit.transform;
         }
@@ -98,9 +100,6 @@ public static class TetherUtils {
         if (adInput != 0) {
             float distanceToTether = Vector3.Distance(tetherPoint, controller.transform.position);
             float rightLeftStrength = Mathf.Clamp01(1f / distanceToTether);
-            if (rightLeftStrength > 0.15f) {
-                PlayerSwungAround?.Invoke();
-            }
             Vector3 swing = Vector3.Cross(Vector3.up, reelDir) * rightLeftStrength *
                                           controller.ControllerData.HoritontalSwingStrength;
             if (adInput < 0) {
@@ -109,6 +108,11 @@ public static class TetherUtils {
             }
             reelDir += swing;
             reelDir.Normalize();
+
+            const float HorizontalSwingEventThreshold = 0.15f;
+            if (rightLeftStrength > HorizontalSwingEventThreshold) {
+                PlayerSwungHorizontal?.Invoke();
+            }
         }
 
         Vector3 goalVelocity = reelDir * controller.ControllerData.MaxReelSpeed;

@@ -7,7 +7,7 @@ public class IsTetheredState : IState {
     private PlayerController _controller;
     private Transform _tetherEnd;
     private float _tetherLength;
-    public static event Action<Transform> EnteredTetherState;
+    public static event Action EnteredState;
 
     public IsTetheredState(StateMachine parentFsm, PlayerController controller,
         Transform tetherEnd) {
@@ -18,7 +18,7 @@ public class IsTetheredState : IState {
 
     public void Enter() {
         _tetherLength = Vector3.Distance(_controller.transform.position, _tetherEnd.position);
-        EnteredTetherState?.Invoke(_tetherEnd);
+        EnteredState?.Invoke();
     }
 
     public void Update() {

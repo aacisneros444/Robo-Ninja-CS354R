@@ -168,8 +168,17 @@ public class OctreeNode {
             return;
         }
 
+        Collider[] intersectedCols = new Collider[1];
         for (int i = 0; i < 8; i++) {
+            bool intersects = false;
             if (_childrenBounds[i].Intersects(bounds)) {
+                int numCols = Physics.OverlapBoxNonAlloc(_childrenBounds[i].center,
+                                                        _childrenBounds[i].extents,
+                                                        intersectedCols,
+                                                        Quaternion.identity);
+                intersects = numCols > 0;
+            }
+            if (intersects) {
                 if (_children == null) {
                     _children = new OctreeNode[8];
                 }
@@ -441,13 +450,15 @@ public class OctreeNode {
         return null;
     }
 
-    public void Draw() {
-        Gizmos.color = Color.green;
-        Gizmos.DrawWireCube(_nodeBounds.center, _nodeBounds.size);
+    public void Draw(bool drawNonEmptyOnly) {
+        if (!drawNonEmptyOnly) {
+            Gizmos.color = Color.green;
+            Gizmos.DrawWireCube(_nodeBounds.center, _nodeBounds.size);
+        }
         if (_children != null) {
             for (int i = 0; i < 8; i++) {
                 if (_children[i] != null) {
-                    _children[i].Draw();
+                    _children[i].Draw(drawNonEmptyOnly);
                 }
             }
         } else if (_numContainedObjects > 0) {

@@ -1,31 +1,21 @@
 using UnityEngine;
 
+/// <summary>
+/// A class to manage line renderers to act as tether visuals for the player.
+/// </summary>
 public class TetherRenderer : MonoBehaviour {
-    [SerializeField] private LineRenderer _leftLineRenderer;
-    [SerializeField] private LineRenderer _rightLineRenderer;
-    // refactor out
-    [SerializeField] private AudioSource _onTetherSound;
-    [SerializeField] private PlayerController _controller;
+    [SerializeField] private PlayerControllerData _controllerData;
+    [SerializeField] private Transform _rightTetherOrigin, _leftTetherOrigin;
+    [SerializeField] private LineRenderer _leftLineRenderer, _rightLineRenderer;
+    [SerializeField] private AudioSource _tetherSoundSource;
     private Transform _tetherEnd;
     private bool _isTethered = false;
 
-    private void Awake() {
-        NotTetheredState.ExitedTetherState += OnDetachTether;
-        IsTetheredState.EnteredTetherState += OnTether;
-        Health.PlayerDied += OnDetachTether;
-    }
-
-    private void OnDestroy() {
-        NotTetheredState.ExitedTetherState -= OnDetachTether;
-        IsTetheredState.EnteredTetherState -= OnTether;
-        Health.PlayerDied -= OnDetachTether;
-    }
-
     private void Update() {
         if (_isTethered && _tetherEnd != null) {
-            UpdateLineRenderer(_leftLineRenderer, _controller.RightTetherOrigin.position,
+            UpdateLineRenderer(_leftLineRenderer, _rightTetherOrigin.position,
                                _tetherEnd.position);
-            UpdateLineRenderer(_rightLineRenderer, _controller.LeftTetherOrigin.position,
+            UpdateLineRenderer(_rightLineRenderer, _leftTetherOrigin.position,
                                _tetherEnd.position);
         }
     }
@@ -37,13 +27,13 @@ public class TetherRenderer : MonoBehaviour {
         lineRenderer.SetPositions(tetherPoints);
     }
 
-    private void OnTether(Transform tetherEnd) {
+    public void SetTether(Transform tetherEnd) {
         _isTethered = true;
         _tetherEnd = tetherEnd;
-        _onTetherSound.Play();
+        _tetherSoundSource.PlayOneShot(_controllerData.TetherSound);
     }
 
-    private void OnDetachTether() {
+    public void DetachTether() {
         _isTethered = false;
         UpdateLineRenderer(_leftLineRenderer, Vector3.zero, Vector3.zero);
         UpdateLineRenderer(_rightLineRenderer, Vector3.zero, Vector3.zero);

@@ -1,6 +1,9 @@
 using UnityEngine;
 using System.Collections.Generic;
 
+/// <summary>
+/// A utility input class used to track if keys were double pressed.
+/// </summary>
 public class InputHelper {
 
     private const float DoublePressTime = 0.4f;
@@ -24,7 +27,6 @@ public class InputHelper {
     }
 
     public bool WasKeyDoublePressed(KeyCode key) {
-        return (Time.realtimeSinceStartup > 2f) &&
-            ((Time.realtimeSinceStartup - _lastKeyPressTimes[key]) < DoublePressTime);
+        return (Time.realtimeSinceStartup - _lastKeyPressTimes[key]) < DoublePressTime;
     }
 }

@@ -4,7 +4,7 @@ using TMPro;
 public class OnPlayerLoseUI : MonoBehaviour {
     [SerializeField] private TMP_Text _gameOverText;
     [SerializeField] private GameObject _mainMenuButton;
-    [SerializeField] private PlayerCamera _playerCamera;
+    [SerializeField] private PlayerCameraController  _playerCamera;
 
     private void Awake() {
         Health.PlayerDied += OnPlayerLose;
